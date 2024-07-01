@@ -3,14 +3,15 @@ const { ObjectId } = require("mongodb");
 const router = express.Router();
 const { jobSchema } = require("../validation/schemas");
 const validate = require("../validation/validate");
+const { date } = require("joi");
 
 // Post a job
-router.post("/post-job", validate(jobSchema), async (req, res) => {
+router.post("/postjob", validate(jobSchema), async (req, res) => {
   const db = req.app.locals.db;
   const jobCollections = db.collection("demoJobs");
   try {
     const body = req.body;
-    body.createdAt = new Date();
+    body.createAt = new date();
     const result = await jobCollections.insertOne(body);
     res.status(200).send(result);
   } catch (error) {
@@ -25,7 +26,7 @@ router.get("/all-jobs", async (req, res) => {
   const jobCollections = db.collection("demoJobs");
   try {
     const jobs = await jobCollections.find().toArray();
-    const sortedJobPosts = jobs.sort((a, b) => b.createdAt - a.createdAt);
+    const sortedJobPosts = jobs.sort((a, b) => b.createAt - a.createAt);
     res.send(sortedJobPosts);
   } catch (error) {
     console.error("Error getting all jobs:", error);
@@ -59,8 +60,7 @@ router.get("/myJobs/:email", async (req, res) => {
     const jobs = await jobCollections
       .find({ postedBy: req.params.email })
       .toArray();
-    const sortedJobPosts = jobs.sort((a, b) => b.createdAt - a.createdAt);
-    res.send(sortedJobPosts);
+    res.send(jobs);
   } catch (error) {
     console.error("Error getting jobs by email:", error);
     res.status(500).send({ message: "Server error", error });

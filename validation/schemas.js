@@ -2,9 +2,9 @@ const Joi = require("joi");
 
 const jobSchema = Joi.object({
   ApplyLink: Joi.string().uri().required(),
-  companyLogo: Joi.string().uri(),
+  companyLogo: Joi.string().uri().required(),
   companyName: Joi.string().required(),
-  createdAt: Joi.date(),
+  createAt: Joi.date(),
   description: Joi.string().required(),
   employmentType: Joi.string(),
   experienceLevel: Joi.string(),
@@ -13,7 +13,7 @@ const jobSchema = Joi.object({
   maxPrice: Joi.number(),
   minPrice: Joi.number(),
   postedBy: Joi.string().email().required(),
-  postingDate: Joi.date().required(),
+  postingDate: Joi.date(),
   salaryType: Joi.string(),
   skills: Joi.array().items(Joi.any().allow(null)),
 
