@@ -11,7 +11,7 @@ router.post("/postjob", validate(jobSchema), async (req, res) => {
   const jobCollections = db.collection("demoJobs");
   try {
     const body = req.body;
-    body.createAt = new date();
+    body.createdAt = new date();
     const result = await jobCollections.insertOne(body);
     res.status(200).send(result);
   } catch (error) {
@@ -26,7 +26,7 @@ router.get("/all-jobs", async (req, res) => {
   const jobCollections = db.collection("demoJobs");
   try {
     const jobs = await jobCollections.find().toArray();
-    const sortedJobPosts = jobs.sort((a, b) => b.createAt - a.createAt);
+    const sortedJobPosts = jobs.sort((a, b) => b.createdAt - a.createdAt);
     res.send(sortedJobPosts);
   } catch (error) {
     console.error("Error getting all jobs:", error);

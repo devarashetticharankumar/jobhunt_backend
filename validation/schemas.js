@@ -4,7 +4,7 @@ const jobSchema = Joi.object({
   ApplyLink: Joi.string().uri().required(),
   companyLogo: Joi.string().uri().required(),
   companyName: Joi.string().required(),
-  createAt: Joi.date(),
+  createdAt: Joi.date(),
   description: Joi.string().required(),
   employmentType: Joi.string(),
   experienceLevel: Joi.string(),
@@ -21,6 +21,7 @@ const jobSchema = Joi.object({
 });
 
 const userSchema = Joi.object({
+  name: Joi.string(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
   // Add other fields as required
