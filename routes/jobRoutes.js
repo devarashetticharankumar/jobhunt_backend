@@ -98,14 +98,17 @@ router.patch("/update-job/:id", async (req, res) => {
       { $set: jobData },
       { upsert: true }
     );
+
     if (result.matchedCount === 1) {
-      res.send({ message: "Job updated successfully" });
+      res.send({ acknowledged: true, message: "Job updated successfully" });
     } else {
-      res.status(404).send({ message: "Job not found" });
+      res.status(404).send({ acknowledged: false, message: "Job not found" });
     }
   } catch (error) {
     console.error("Error updating job:", error);
-    res.status(500).send({ message: "Server error", error });
+    res
+      .status(500)
+      .send({ acknowledged: false, message: "Server error", error });
   }
 });
 
