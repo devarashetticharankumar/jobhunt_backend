@@ -18,7 +18,7 @@ router.post(
       if (existingSubscription) {
         return res
           .status(400)
-          .send({ message: "Email already subscribed 😒", status: false });
+          .send({ message: "Email already subscribed", status: false });
       }
 
       const result = await subscriptionsCollection.insertOne({
