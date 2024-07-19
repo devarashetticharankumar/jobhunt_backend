@@ -4,21 +4,108 @@ const router = express.Router();
 const { jobSchema } = require("../validation/schemas");
 const validate = require("../validation/validate");
 const { date } = require("joi");
+// const { sendEmailNotification } = require("../services/emailService");
 
-// Post a job
+const nodemailer = require("nodemailer");
+
+// Nodemailer transporter setup
+let transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USERNAME,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
+
+// Modified /postjob route with email notification
 router.post("/postjob", validate(jobSchema), async (req, res) => {
   const db = req.app.locals.db;
   const jobCollections = db.collection("demoJobs");
+  const subscriptionsCollection = db.collection("EmailSubscriptions");
+
   try {
     const body = req.body;
     body.createdAt = new Date();
     const result = await jobCollections.insertOne(body);
+
+    // Retrieve all subscribed emails
+    const subscribers = await subscriptionsCollection.find({}).toArray();
+    const subscriberEmails = subscribers.map((subscriber) => subscriber.email);
+
+    // Define email options
+    let mailOptions = {
+      from: process.env.EMAIL_USERNAME,
+      to: subscriberEmails,
+      subject: "New Job Posted!",
+      text: `Hi there! A new job has been posted that might interest you: ${body.jobTitle}`,
+      html: `
+    <h1>New Job Opportunity: ${body.jobTitle}</h1>
+    <h2>Company: ${body.companyName}</h2>
+    <p>${body.description}</p>
+    <p>For more details, visit our website at <a href="https://jobhunt4u.netlify.app" target="_blank">Job Hunt</a>.</p>
+  `,
+    };
+
+    // Send email with defined transport object
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+      } else {
+        console.log("Email sent:", info.response);
+      }
+    });
+
     res.status(200).send(result);
   } catch (error) {
     console.error("Error posting job:", error);
     res.status(500).send({ message: "Server error", error });
   }
 });
+
+// Post a job
+// router.post("/postjob", validate(jobSchema), async (req, res) => {
+//   const db = req.app.locals.db;
+//   const jobCollections = db.collection("demoJobs");
+//   try {
+//     const body = req.body;
+//     body.createdAt = new Date();
+//     const result = await jobCollections.insertOne(body);
+//     res.status(200).send(result);
+//   } catch (error) {
+//     console.error("Error posting job:", error);
+//     res.status(500).send({ message: "Server error", error });
+//   }
+// });
+
+// router.post("/postjob", validate(jobSchema), async (req, res) => {
+//   const db = req.app.locals.db;
+//   const jobCollections = db.collection("demoJobs");
+//   const subscriptionsCollection = db.collection("EmailSubscriptions");
+
+//   try {
+//     const body = req.body;
+//     body.createdAt = new Date();
+//     const result = await jobCollections.insertOne(body);
+
+//     // Fetch all subscribed emails
+//     const subscribers = await subscriptionsCollection.find().toArray();
+//     const emails = subscribers.map((subscriber) => subscriber.email);
+
+//     // Send email notification to all subscribed users
+//     const subject = "New Job Posted!";
+//     const text = `A new job has been posted: ${body.title}\n\n${body.description}`;
+
+//     emails.forEach((email) => {
+//       sendEmailNotification(email, subject, text);
+//       console.log(sendEmailNotification(email, subject, text));
+//     });
+
+//     res.status(200).send(result);
+//   } catch (error) {
+//     console.error("Error posting job:", error);
+//     res.status(500).send({ message: "Server error", error });
+//   }
+// });
 
 // Get all jobs
 router.get("/all-jobs", async (req, res) => {
