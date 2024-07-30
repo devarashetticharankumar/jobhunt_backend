@@ -44,10 +44,12 @@ async function connectDB() {
 const jobRoutes = require("./routes/jobRoutes");
 const userRoutes = require("./routes/userRoutes");
 const subscriptionRoutes = require("./routes/subscriptionRoutes");
+const contactUs = require("./routes/ContactUs");
 
 app.use("/jobs", jobRoutes);
 app.use("/users", userRoutes);
 app.use("/subscriptions", subscriptionRoutes);
+app.use("/api", contactUs);
 
 app.get("/", (req, res) => {
   res.send("Hello World!!!!!!!!!!!");

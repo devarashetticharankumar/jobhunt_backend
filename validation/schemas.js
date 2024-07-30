@@ -36,9 +36,18 @@ const emailSubscriptionSchema = Joi.object({
   email: Joi.string().email().required(),
 });
 
+// Contact Schema
+const contactSchema = Joi.object({
+  firstName: Joi.string().required(),
+  lastName: Joi.string(),
+  email: Joi.string().required(),
+  message: Joi.string().required(),
+});
+
 module.exports = {
   jobSchema,
   userSchema,
   loginSchema,
   emailSubscriptionSchema,
+  contactSchema,
 };
