@@ -131,9 +131,7 @@ router.post("/contact", validate(contactSchema), async (req, res) => {
     });
 
     // Send success response
-    return res
-      .status(200)
-      .json({ message: "Message sent and saved successfully!" });
+    return res.status(200).json({ message: "Message sent successfully!" });
   } catch (error) {
     console.error("Error sending email:", error);
 
