@@ -141,16 +141,31 @@ router.get("/all-jobs/:id", async (req, res) => {
 });
 
 // Get jobs by email
+// router.get("/myJobs/:email", async (req, res) => {
+//   const db = req.app.locals.db;
+//   const jobCollections = db.collection("demoJobs");
+//   try {
+//     const jobs = await jobCollections
+//       .find({ postedBy: req.params.email })
+//       .toArray();
+//     res.send(jobs);
+//   } catch (error) {
+//     console.error("Error getting jobs by email:", error);
+//     res.status(500).send({ message: "Server error", error });
+//   }
+// });
+
+// Route to fetch jobs posted by a specific email
 router.get("/myJobs/:email", async (req, res) => {
   const db = req.app.locals.db;
   const jobCollections = db.collection("demoJobs");
+
   try {
-    const jobs = await jobCollections
-      .find({ postedBy: req.params.email })
-      .toArray();
-    res.send(jobs);
+    const { email } = req.params;
+    const jobs = await jobCollections.find({ postedBy: email }).toArray();
+    res.status(200).send(jobs);
   } catch (error) {
-    console.error("Error getting jobs by email:", error);
+    console.error("Error fetching jobs:", error);
     res.status(500).send({ message: "Server error", error });
   }
 });
