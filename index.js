@@ -51,6 +51,23 @@ app.use("/users", userRoutes);
 app.use("/subscriptions", subscriptionRoutes);
 app.use("/api", contactUs);
 
+const { expressjwt: jwt } = require("express-jwt");
+const jwksRsa = require("jwks-rsa");
+
+const checkJwt = jwt({
+  secret: jwksRsa.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: process.env.JWKSURI,
+  }),
+  audience: process.env.AUDIENCE,
+  issuer: process.env.ISSUER,
+  algorithms: ["RS256"],
+});
+
+app.use(checkJwt);
+
 app.get("/", (req, res) => {
   res.send("Hello World!!!!!!!!!!!");
 });

@@ -42,7 +42,7 @@ router.post("/postjob", validate(jobSchema), async (req, res) => {
     <h1>New Job Opportunity: ${body.jobTitle}</h1>
     <h2>Company: ${body.companyName}</h2>
     <p>${body.description}</p>
-    <p>For more details, visit our website at <a href="https://jobhunt1.netlify.app" target="_blank">Job Hunt</a>.</p>
+    <p>For more details, visit our website at <a href="https://jobnirvana.netlify.app" target="_blank">JobNirvana</a>.</p>
   `,
     };
 
