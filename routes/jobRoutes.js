@@ -3,7 +3,6 @@ const { ObjectId } = require("mongodb");
 const router = express.Router();
 const { jobSchema } = require("../validation/schemas");
 const validate = require("../validation/validate");
-const { date } = require("joi");
 // const { sendEmailNotification } = require("../services/emailService");
 
 const nodemailer = require("nodemailer");
@@ -41,8 +40,9 @@ router.post("/postjob", validate(jobSchema), async (req, res) => {
       html: `
     <h1>New Job Opportunity: ${body.jobTitle}</h1>
     <h2>Company: ${body.companyName}</h2>
+    <img src="${body.companyLogo}" alt="${body.companyName} Logo" style="max-width: 100%; height: auto;">
     <p>${body.description}</p>
-    <p>For more details, visit our website at <a href="https://jobnirvana.netlify.app" target="_blank">JobNirvana</a>.</p>
+    <p>For more details, visit our website at <a href="https://jobnirvana.netlify.app/job/${id}" target="_blank">JobNirvana</a>.</p>
   `,
     };
 
