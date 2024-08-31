@@ -25,6 +25,8 @@ router.post("/postjob", validate(jobSchema), async (req, res) => {
   try {
     const body = req.body;
     body.createdAt = new Date();
+
+    // Insert job into the database
     const result = await jobCollections.insertOne(body);
 
     // Retrieve all subscribed emails
@@ -38,22 +40,24 @@ router.post("/postjob", validate(jobSchema), async (req, res) => {
       subject: "New Job Posted!",
       text: `Hi there! A new job has been posted that might interest you: ${body.jobTitle}`,
       html: `
-    <h1>New Job Opportunity: ${body.jobTitle}</h1>
-    <h2>Company: ${body.companyName}</h2>
-    <img src="${body.companyLogo}" alt="${body.companyName} Logo" style="max-width: 100%; height: auto;">
-    <p>${body.description}</p>
-    <p>For more details, visit our website at <a href="https://jobnirvana.netlify.app/job/${id}" target="_blank">JobNirvana</a>.</p>
-  `,
+        <h1>New Job Opportunity: ${body.jobTitle}</h1>
+        <h2>Company: ${body.companyName}</h2>
+        <img src="${body.companyLogo}" alt="${body.companyName} Logo" style="max-width: 100%; height: auto;">
+        <p>${body.description}</p>
+        <p>For more details, visit our website at <a href="https://jobnirvana.netlify.app/job/${result.insertedId}" target="_blank">JobNirvana</a>.</p>
+      `,
     };
 
     // Send email with defined transport object
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Error sending email:", error);
-      } else {
-        console.log("Email sent:", info.response);
-      }
-    });
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log("Email sent");
+    } catch (emailError) {
+      console.error("Error sending email:", emailError);
+      return res
+        .status(500)
+        .send({ message: "Failed to send email", error: emailError });
+    }
 
     res.status(200).send(result);
   } catch (error) {
@@ -61,7 +65,6 @@ router.post("/postjob", validate(jobSchema), async (req, res) => {
     res.status(500).send({ message: "Server error", error });
   }
 });
-
 // Post a job
 // router.post("/postjob", validate(jobSchema), async (req, res) => {
 //   const db = req.app.locals.db;
