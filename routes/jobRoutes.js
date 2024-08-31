@@ -189,7 +189,7 @@ router.delete("/job/:id", async (req, res) => {
 });
 
 // Update a job
-router.patch("/update-job/:id", async (req, res) => {
+router.patch("/update-job/:id", validate(jobSchema), async (req, res) => {
   const db = req.app.locals.db;
   const jobCollections = db.collection("demoJobs");
   try {
@@ -213,5 +213,4 @@ router.patch("/update-job/:id", async (req, res) => {
       .send({ acknowledged: false, message: "Server error", error });
   }
 });
-
 module.exports = router;

@@ -10,13 +10,12 @@ const jobSchema = Joi.object({
   experienceLevel: Joi.string(),
   jobLocation: Joi.string(),
   jobTitle: Joi.string().required(),
-  maxPrice: Joi.number(),
-  minPrice: Joi.number(),
+  maxPrice: Joi.number().optional(),
+  minPrice: Joi.number().optional(),
   postedBy: Joi.string().email().required(),
   postingDate: Joi.date(),
   salaryType: Joi.string(),
   skills: Joi.array().items(Joi.any().allow(null)),
-
   // Add other fields as required
 });
 
