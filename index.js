@@ -3,6 +3,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const dotenv = require("dotenv");
+const path = require("path");
 
 dotenv.config();
 const app = express();
@@ -12,6 +13,9 @@ const port = process.env.PORT || 8080;
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors());
+
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, "public")));
 
 // Check environment variables
 if (!process.env.MONGO_URI || !process.env.JWT_SECRET) {
