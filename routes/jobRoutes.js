@@ -159,6 +159,8 @@ router.post("/postjob", validate(jobSchema), async (req, res) => {
 //   }
 // });
 
+///////////////////////////////////////////////////////////////////////////////////////////
+
 // Get all jobs
 router.get("/all-jobs", async (req, res) => {
   const db = req.app.locals.db;
