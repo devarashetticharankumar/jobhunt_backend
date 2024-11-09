@@ -6,6 +6,7 @@ const blogSchema = Joi.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/) // Slug format with lowercase letters, numbers, and hyphens
     .optional(), // Slug is optional but must follow the format if provided
   author: Joi.string().min(3).max(50).required(), // Author must be a string with a minimum length of 3 and maximum length of 50
+  tags: Joi.array().items(Joi.string()).optional(),
   publishedDate: Joi.date()
     .optional()
     .default(() => new Date()), // Defaults to current date if not provided
