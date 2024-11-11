@@ -10,7 +10,7 @@ const blogSchema = Joi.object({
   publishedDate: Joi.date()
     .optional()
     .default(() => new Date()), // Defaults to current date if not provided
-  content: Joi.string().min(10).required(), // Content must be a string with a minimum length of 10
+  content: Joi.string().required(), // Content must be a string with a minimum length of 10
   thumbnail: Joi.string().uri().optional(), // Thumbnail must be a valid URI if provided
   category: Joi.string().min(3).max(50).required(),
   comments: Joi.array()

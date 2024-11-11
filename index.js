@@ -13,7 +13,7 @@ const port = process.env.PORT || 8080;
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors());
-
+app.use(cors({ origin: "https://jobnirvana.netlify.app" }));
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "public")));
 
