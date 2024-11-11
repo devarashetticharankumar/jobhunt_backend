@@ -4,6 +4,9 @@ const router = express.Router();
 // const validate = require("../validation/validate");
 const blogSchema = require("../validation/blogSchema");
 const validate = require("../validation/validate");
+const cors = require("cors");
+const app = express();
+app.use(cors()); // Apply CORS globally
 
 const generateSlug = (title) => {
   return title
