@@ -1,7 +1,5 @@
 const express = require("express");
 const router = express.Router();
-// const blogSchema = require("../validation/blogSchema");
-// const validate = require("../validation/validate");
 const blogSchema = require("../validation/blogSchema");
 const validate = require("../validation/validate");
 const cors = require("cors");
@@ -16,35 +14,6 @@ const generateSlug = (title) => {
 };
 
 // Create Blog
-// router.post("/create-blog", validate(blogSchema), async (req, res) => {
-//   const db = req.app.locals.db;
-//   const blogCollection = db.collection("blogs");
-
-//   try {
-//     const body = req.body;
-//     if (!body.title || !body.content) {
-//       return res
-//         .status(400)
-//         .send({ message: "Title and content are required" });
-//     }
-
-//     body.publishedDate = new Date(); // Set the published date to the current date if not provided
-//     body.slug = generateSlug(body.title); // Generate slug from title
-
-//     // Insert blog post into the database
-//     const result = await blogCollection.insertOne(body);
-//     if (result.insertedCount === 1) {
-//       res
-//         .status(201)
-//         .send({ message: "Blog created successfully", blog: result.ops[0] });
-//     } else {
-//       res.status(400).send({ message: "Failed to create blog" });
-//     }
-//   } catch (error) {
-//     console.error("Error creating blog post:", error);
-//     res.status(500).send({ message: "Server error", error });
-//   }
-// });
 router.post("/create-blog", validate(blogSchema), async (req, res) => {
   const db = req.app.locals.db;
   const blogCollection = db.collection("blogs");
