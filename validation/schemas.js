@@ -16,9 +16,7 @@ const jobSchema = Joi.object({
   postingDate: Joi.date(),
   salaryType: Joi.string(),
   skills: Joi.array().items(Joi.any().allow(null)),
-  slug: Joi.string()
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/) // Slug format with lowercase letters, numbers, and hyphens
-    .optional(), // Slug is optional but must follow the format if provided
+  // Slug is optional but must follow the format if provided
 });
 
 const userSchema = Joi.object({
