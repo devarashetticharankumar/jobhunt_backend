@@ -69,6 +69,43 @@ router.get("/all-blogs", async (req, res) => {
   }
 });
 
+// Get all Blogs with Pagination
+// router.get("/all-blogs", async (req, res) => {
+//   const db = req.app.locals.db;
+//   const blogCollection = db.collection("blogs");
+
+//   // Get page and limit from query parameters, with defaults if not provided
+//   const page = parseInt(req.query.page) || 1;
+//   const limit = parseInt(req.query.limit) || 10;
+
+//   const skip = (page - 1) * limit;
+
+//   try {
+//     const totalBlogs = await blogCollection.countDocuments(); // Get the total number of blogs
+//     const blogs = await blogCollection
+//       .find()
+//       .skip(skip) // Skip the number of documents based on the page
+//       .limit(limit) // Limit the number of documents to the specified limit
+//       .toArray();
+
+//     // Sort by published date
+//     const sortedBlogs = blogs.sort(
+//       (a, b) => new Date(b.publishedDate) - new Date(a.publishedDate)
+//     );
+
+//     // Send the response with pagination details
+//     res.send({
+//       blogs: sortedBlogs,
+//       currentPage: page,
+//       totalPages: Math.ceil(totalBlogs / limit), // Calculate the total number of pages
+//       totalBlogs: totalBlogs,
+//     });
+//   } catch (error) {
+//     console.error("Error getting all blogs:", error);
+//     res.status(500).send({ message: "Server error", error });
+//   }
+// });
+
 // Get Blog by Slug
 router.get("/blog/:slug", async (req, res) => {
   const db = req.app.locals.db;

@@ -85,6 +85,41 @@ router.get("/all-jobs", async (req, res) => {
   }
 });
 
+// Get all jobs with pagination
+// router.get("/all-jobs", async (req, res) => {
+//   const db = req.app.locals.db;
+//   const jobCollections = db.collection("demoJobs");
+
+//   try {
+//     // Get pagination parameters from query string, default values if not provided
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = parseInt(req.query.limit) || 10; // Default limit to 10 jobs per page
+//     const skip = (page - 1) * limit;
+
+//     // Fetch jobs with pagination
+//     const jobs = await jobCollections.find().skip(skip).limit(limit).toArray();
+
+//     // Get total job count for pagination metadata
+//     const totalJobs = await jobCollections.countDocuments();
+
+//     // Sort the jobs by creation date
+//     const sortedJobPosts = jobs.sort((a, b) => b.createdAt - a.createdAt);
+
+//     // Send response with job data and pagination info
+//     res.send({
+//       jobs: sortedJobPosts,
+//       pagination: {
+//         currentPage: page,
+//         totalPages: Math.ceil(totalJobs / limit),
+//         totalJobs: totalJobs,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error getting all jobs:", error);
+//     res.status(500).send({ message: "Server error", error });
+//   }
+// });
+
 // Get single job by ID
 router.get("/all-jobs/:id", async (req, res) => {
   const db = req.app.locals.db;

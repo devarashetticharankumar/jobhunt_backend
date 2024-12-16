@@ -7,23 +7,6 @@ const slugify = require("slugify"); // Add this package for slug generation
 const router = express.Router();
 
 // Create a new blog post
-// router.post("/post-blog", validateRequest(blogSchema), async (req, res) => {
-//   const db = req.app.locals.db;
-//   const blogCollection = db.collection("blogs");
-
-//   try {
-//     const body = req.body;
-//     body.publishedDate = new Date();
-
-//     const result = await blogCollection.insertOne(body);
-//     res.status(200).send(result);
-//   } catch (error) {
-//     console.error("Error posting blog:", error);
-//     res.status(500).send({ message: "Server error", error });
-//   }
-// });
-
-// Create a new blog post
 router.post("/post-blog", validateRequest(blogSchema), async (req, res) => {
   const db = req.app.locals.db;
   const blogCollection = db.collection("blogs");
