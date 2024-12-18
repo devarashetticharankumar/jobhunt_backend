@@ -56,12 +56,14 @@ const userRoutes = require("./routes/userRoutes");
 const subscriptionRoutes = require("./routes/subscriptionRoutes");
 const contactUs = require("./routes/ContactUs");
 const blogRoutes = require("./routes/blogRoutes"); // Add this line
+const resume = require("./routes/ResumeRoutes");
 
 app.use("/jobs", jobRoutes);
 app.use("/users", userRoutes);
 app.use("/subscriptions", subscriptionRoutes);
 app.use("/api", contactUs);
 app.use("/blogs", blogRoutes); // Add this line
+app.use("/resume", resume);
 
 const { expressjwt: jwt } = require("express-jwt");
 const jwksRsa = require("jwks-rsa");

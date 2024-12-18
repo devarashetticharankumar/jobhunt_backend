@@ -1,3 +1,5 @@
+// i am not usingthis routes
+
 // routes/blogRoutes.js
 const express = require("express");
 const { blogSchema } = require("../validation/schemas");
