@@ -18,7 +18,9 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors());
 app.use(
-  cors({ origin: ["https://jobnirvana.netlify.app", "http://localhost:5173"] })
+  cors({
+    origin: ["https://jobnirvana.netlify.app", "http://localhost:5173"],
+  })
 );
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "public")));
@@ -56,14 +58,14 @@ const userRoutes = require("./routes/userRoutes");
 const subscriptionRoutes = require("./routes/subscriptionRoutes");
 const contactUs = require("./routes/ContactUs");
 const blogRoutes = require("./routes/blogRoutes"); // Add this line
-const resume = require("./routes/ResumeRoutes");
+// const resume = require("./routes/ResumeRoutes");
 
 app.use("/jobs", jobRoutes);
 app.use("/users", userRoutes);
 app.use("/subscriptions", subscriptionRoutes);
 app.use("/api", contactUs);
 app.use("/blogs", blogRoutes); // Add this line
-app.use("/resume", resume);
+// app.use("/resume", resume);
 
 const { expressjwt: jwt } = require("express-jwt");
 const jwksRsa = require("jwks-rsa");
