@@ -24,7 +24,9 @@
     "mongoose": "^8.5.2",
     "nodemailer": "^6.9.14",
     "nodemon": "^3.1.4",
+    "sitemap": "^8.0.0",
     "slugify": "^1.6.6",
-    "web-push": "^3.6.7"
+    "web-push": "^3.6.7",
+    "xmlbuilder": "^15.1.1"
   }
 }
