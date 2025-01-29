@@ -2,8 +2,13 @@ const express = require("express");
 const builder = require("xmlbuilder");
 
 const sitemapRouter = express.Router();
-
+// const redirectToFrontendSitemap = true; // Set to true if you want to redirect requests for the sitemap
 sitemapRouter.get("/sitemap.xml", async (req, res) => {
+  // if (redirectToFrontendSitemap) {
+  //   // Redirect to the Netlify-hosted sitemap URL
+  //   const netlifySitemapUrl = "https://jobnirvana.netlify.app/sitemap.xml";
+  //   return res.redirect(netlifySitemapUrl);
+  // }
   try {
     const db = req.app.locals.db; // Use app.locals to access the database
     const baseUrl = "https://jobnirvana.netlify.app";

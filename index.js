@@ -59,7 +59,7 @@ const subscriptionRoutes = require("./routes/subscriptionRoutes");
 const contactUs = require("./routes/ContactUs");
 const blogRoutes = require("./routes/blogRoutes");
 const sitemapRouter = require("./routes/sitemap");
-// const resume = require("./routes/ResumeRoutes");
+const resume = require("./routes/resumeRoutes");
 
 app.use("/jobs", jobRoutes);
 app.use("/users", userRoutes);
@@ -67,7 +67,7 @@ app.use("/subscriptions", subscriptionRoutes);
 app.use("/api", contactUs);
 app.use("/blogs", blogRoutes);
 app.use("/", sitemapRouter);
-// app.use("/resume", resume);
+app.use("/resumes", resume);
 
 const { expressjwt: jwt } = require("express-jwt");
 const jwksRsa = require("jwks-rsa");
