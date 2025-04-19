@@ -24,6 +24,7 @@ const blogSchema = Joi.object({
     .optional(), // Comments array is optional
   likes: Joi.number().integer().min(0).optional(), // Likes should be a non-negative integer
   views: Joi.number().integer().min(0).optional(), // Views should be a non-negative integer
+  // postedBy: Joi.string().email().required(),
 });
 
 module.exports = blogSchema;
