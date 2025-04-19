@@ -96,4 +96,5 @@ app.listen(port, () => {
 
 connectDB().then((db) => {
   app.locals.db = db;
+  global.db = db;
 });
