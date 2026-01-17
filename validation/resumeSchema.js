@@ -10,17 +10,16 @@ const resumeSchema = Joi.object({
     lastName: Joi.string().min(2).max(50).required(),
     email: Joi.string().email().required(),
     phone: Joi.string()
-      .pattern(/^\+\d{1,3}\s?\d{1,14}$/)
       .optional(),
-    location: Joi.string().min(2).max(100).optional(),
-    websites: Joi.array().items(Joi.string().uri()).optional(),
+    location: Joi.string().min(2).max(500).optional(),
+    websites: Joi.array().items(Joi.string()).optional(),
     socialLinks: Joi.object({
-      linkedin: Joi.string().uri().optional(),
-      facebook: Joi.string().uri().optional(),
-      twitter: Joi.string().uri().optional(),
-      instagram: Joi.string().uri().optional(),
-      github: Joi.string().uri().optional(),
-      personalWebsite: Joi.string().uri().optional(),
+      linkedin: Joi.string().optional(),
+      facebook: Joi.string().optional(),
+      twitter: Joi.string().optional(),
+      instagram: Joi.string().optional(),
+      github: Joi.string().optional(),
+      personalWebsite: Joi.string().optional(),
     }).optional(),
   }).required(),
 
@@ -28,9 +27,9 @@ const resumeSchema = Joi.object({
   professionalSummary: Joi.string()
     .custom((value, helpers) => {
       const wordCount = value.trim().split(/\s+/).length;
-      if (wordCount < 10 || wordCount > 100) {
+      if (wordCount < 1 || wordCount > 500) {
         return helpers.error("string.base", {
-          message: "Must be between 10 and 100 words",
+          message: "Must be between 1 and 500 words",
         });
       }
       return value;
@@ -38,17 +37,17 @@ const resumeSchema = Joi.object({
     .optional(),
 
   // Wanted Job Title (Optional)
-  wantedJobTitle: Joi.string().min(2).max(500).optional(),
+  wantedJobTitle: Joi.string().min(2).max(1000).optional(),
 
   // Work Experience (Array of Job Objects)
   workExperience: Joi.array()
     .items(
       Joi.object({
-        jobTitle: Joi.string().min(2).max(500).required(),
-        companyName: Joi.string().min(2).max(300).required(),
+        jobTitle: Joi.string().min(2).max(1000).required(),
+        companyName: Joi.string().min(2).max(1000).required(),
         startDate: Joi.date().required(),
-        endDate: Joi.date().greater(Joi.ref("startDate")).optional(),
-        description: Joi.string().min(10).max(500).optional(),
+        endDate: Joi.date().optional().allow(null, ""),
+        description: Joi.string().min(1).max(5000).optional(),
         skillsUsed: Joi.array().items(Joi.string().min(2).max(50)).optional(),
       })
     )
@@ -58,24 +57,24 @@ const resumeSchema = Joi.object({
   education: Joi.array()
     .items(
       Joi.object({
-        degree: Joi.string().min(2).max(300).required(),
-        institutionName: Joi.string().min(2).max(300).required(),
-        graduationDate: Joi.date().max("now").required(),
+        degree: Joi.string().min(2).max(1000).required(),
+        institutionName: Joi.string().min(2).max(1000).required(),
+        graduationDate: Joi.date().required(),
         coursework: Joi.array().items(Joi.string().min(2).max(100)).optional(),
       })
     )
     .optional(),
 
   // Skills (Array of Strings)
-  skills: Joi.array().items(Joi.string().min(2).max(50)).optional(),
+  skills: Joi.array().items(Joi.string().min(2).max(200)).optional(),
 
   // Certifications (Array of Objects)
   certifications: Joi.array()
     .items(
       Joi.object({
-        name: Joi.string().min(2).max(200).required(),
-        organization: Joi.string().min(2).max(200).required(),
-        date: Joi.date().max("now").required(),
+        name: Joi.string().min(2).max(1000).required(),
+        organization: Joi.string().min(2).max(1000).required(),
+        date: Joi.date().optional().allow(null, ""),
       })
     )
     .optional(),
@@ -84,12 +83,12 @@ const resumeSchema = Joi.object({
   projects: Joi.array()
     .items(
       Joi.object({
-        title: Joi.string().min(2).max(200).required(),
-        description: Joi.string().min(10).max(500).optional(),
-        technologies: Joi.array().items(Joi.string().min(2).max(50)).optional(),
-        startDate: Joi.date().required(),
-        endDate: Joi.date().greater(Joi.ref("startDate")).optional(),
-        projectLink: Joi.string().uri().optional(),
+        title: Joi.string().min(2).max(1000).required(),
+        description: Joi.string().min(1).max(5000).optional(),
+        technologies: Joi.array().items(Joi.string().min(1).max(100)).optional(),
+        startDate: Joi.date().optional().allow(null, ""),
+        endDate: Joi.date().optional().allow(null, ""),
+        projectLink: Joi.string().optional(),
       })
     )
     .optional(),
@@ -101,10 +100,9 @@ const resumeSchema = Joi.object({
   references: Joi.array()
     .items(
       Joi.object({
-        name: Joi.string().min(2).max(100).required(),
+        name: Joi.string().min(2).max(500).required(),
         relationship: Joi.string().min(2).max(50).optional(),
         contact: Joi.string()
-          .pattern(/^\+\d{1,3}\s?\d{1,14}$/)
           .optional(),
       })
     )
@@ -114,17 +112,25 @@ const resumeSchema = Joi.object({
   internships: Joi.array()
     .items(
       Joi.object({
-        title: Joi.string().min(2).max(100).required(),
-        company: Joi.string().min(2).max(100).required(),
+        title: Joi.string().min(2).max(500).required(),
+        company: Joi.string().min(2).max(500).required(),
         startDate: Joi.date().required(),
-        endDate: Joi.date().greater(Joi.ref("startDate")).optional(),
-        description: Joi.string().min(10).max(500).optional(),
+        endDate: Joi.date().optional().allow(null, ""),
+        description: Joi.string().min(1).max(5000).optional(),
       })
     )
     .optional(),
 
   // Acknowledgment (Optional - String)
-  acknowledgment: Joi.string().min(10).max(300).optional(),
+  acknowledgment: Joi.string().min(1).max(2000).optional(),
+
+  // Template Selection
+  template: Joi.string().valid(
+    "modern", "professional", "creative",
+    "minimalist", "executive", "simple", "academic", "tech",
+    "designer", "compact", "bold", "corporate", "elegant",
+    "startup", "classic"
+  ).default("modern").optional(),
 
   // Last Modified Date
   lastModified: Joi.date().default(Date.now),

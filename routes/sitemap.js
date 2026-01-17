@@ -89,12 +89,24 @@ const builder = require("xmlbuilder");
 const sitemapRouter = express.Router();
 sitemapRouter.get("/sitemap.xml", async (req, res) => {
   try {
+    console.log("Generating sitemap...");
     const db = req.app.locals.db; // Use app.locals to access the database
+
+    if (!db) {
+      console.error("Database connection not found in app.locals");
+      return res.status(500).send("Database not connected");
+    }
+
     const baseUrl = "https://jobnirvana.netlify.app";
 
     // Fetch jobs and blogs from the database
+    console.log("Fetching jobs from DB...");
     const jobs = await db.collection("demoJobs").find().toArray();
+    console.log(`Fetched ${jobs.length} jobs.`);
+
+    console.log("Fetching blogs from DB...");
     const blogs = await db.collection("blogs").find().toArray();
+    console.log(`Fetched ${blogs.length} blogs.`);
 
     // Create Sitemap XML
     const sitemap = builder
@@ -110,6 +122,8 @@ sitemapRouter.get("/sitemap.xml", async (req, res) => {
       { url: "/salary", updatedAt: new Date().toISOString() },
       { url: "/blogs", updatedAt: new Date().toISOString() },
       { url: "/youtube-videos", updatedAt: new Date().toISOString() },
+      { url: "/terms", updatedAt: new Date().toISOString() },
+      { url: "/privacy-policy", updatedAt: new Date().toISOString() },
     ];
     staticPages.forEach((page) => {
       sitemap
@@ -125,6 +139,7 @@ sitemapRouter.get("/sitemap.xml", async (req, res) => {
     });
 
     // Add Dynamic Job Pages
+    console.log("Adding dynamic job pages...");
     jobs.forEach((job) => {
       sitemap
         .ele("url")
@@ -139,6 +154,7 @@ sitemapRouter.get("/sitemap.xml", async (req, res) => {
     });
 
     // Add Dynamic Blog Pages
+    console.log("Adding dynamic blog pages...");
     blogs.forEach((blog) => {
       sitemap
         .ele("url")
@@ -153,11 +169,12 @@ sitemapRouter.get("/sitemap.xml", async (req, res) => {
     });
 
     // Set Header and Send Response
+    console.log("Sending sitemap response...");
     res.header("Content-Type", "application/xml");
     res.send(sitemap.end({ pretty: true }));
   } catch (error) {
     console.error("Error generating sitemap:", error);
-    res.status(500).send("Error generating sitemap");
+    res.status(500).send(`Error generating sitemap: ${error.message}`);
   }
 });
 

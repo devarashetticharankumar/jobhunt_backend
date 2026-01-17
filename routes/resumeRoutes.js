@@ -170,12 +170,21 @@ const sendResponse = (res, status, message, data = null) => {
 };
 
 // Middleware to ensure authentication
-const ensureAuthenticated = (req, res, next) => {
-  if (!req.user) {
-    return res.status(401).send({ message: "Unauthorized: Please log in" });
+const checkJwt = require("../middleware/checkJwt");
+
+// Middleware to ensure authentication and map req.auth to req.user
+const ensureAuthenticated = [
+  checkJwt,
+  (req, res, next) => {
+    if (req.auth) {
+      req.user = req.auth; // Map express-jwt's req.auth to req.user for consistency
+    }
+    if (!req.user) {
+      return res.status(401).send({ message: "Unauthorized: Please log in" });
+    }
+    next();
   }
-  next();
-};
+];
 
 ///////////////////////////////////////////////////////////////////////////////////////
 

@@ -11,6 +11,7 @@
 module.exports = (schema) => (req, res, next) => {
   const { error } = schema.validate(req.body);
   if (error) {
+    console.error("Validation Error:", JSON.stringify(error.details, null, 2));
     return res.status(400).send({ message: error.details[0].message });
   }
   next();

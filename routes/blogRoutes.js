@@ -58,11 +58,23 @@ router.get("/all-blogs", async (req, res) => {
   const blogCollection = db.collection("blogs");
 
   try {
-    const blogs = await blogCollection.find().toArray();
-    const sortedBlogs = blogs.sort(
-      (a, b) => new Date(b.publishedDate) - new Date(a.publishedDate) // Sort by published date
-    );
-    res.send(sortedBlogs);
+    const blogs = await blogCollection
+      .aggregate([
+        { $sort: { publishedDate: -1 } },
+        {
+          $project: {
+            _id: 1,
+            title: 1,
+            slug: 1,
+            category: 1,
+            author: 1,
+            thumbnail: 1,
+            publishedDate: 1
+          },
+        },
+      ])
+      .toArray();
+    res.send(blogs);
   } catch (error) {
     console.error("Error getting all blogs:", error);
     res.status(500).send({ message: "Server error", error });
