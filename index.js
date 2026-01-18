@@ -43,6 +43,7 @@ const client = new MongoClient(uri, {
 // Database connection
 let db;
 const setupJobAlerts = require("./cron/jobAlerts");
+const setupJobScraper = require("./cron/jobScraper");
 
 async function connectDB() {
   try {
@@ -54,6 +55,7 @@ async function connectDB() {
 
     // Initialize Cron Jobs
     setupJobAlerts(db);
+    setupJobScraper(db);
 
   } catch (error) {
     console.error("Failed to connect to MongoDB:", error);
@@ -108,7 +110,16 @@ const checkJwt = jwt({
   algorithms: ["RS256"],
 });
 
-app.use(checkJwt);
+// app.use(checkJwt); // Removed global checkJwt as it applies to all routes unexpectedly
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error("Unhandled Error:", err);
+  if (err.name === "UnauthorizedError") {
+    return res.status(401).json({ message: "Invalid or missing token" });
+  }
+  res.status(500).json({ message: "Internal Server Error", error: err.message });
+});
 
 app.get("/", (req, res) => {
   res.send("Hello World!!!!!!!!!!!");
