@@ -2,46 +2,68 @@ const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const nodemailer = require("nodemailer");
 const slugify = require("slugify");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { ObjectId } = require("mongodb");
 const { jobSchema } = require("../validation/schemas");
 
 puppeteer.use(StealthPlugin());
 
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-// Nodemailer setup
-let transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD,
-    },
-});
+// Synonym Map for Manual Rewriting
+const synonymMap = {
+    "required": ["essential", "needed", "mandatory", "vital"],
+    "experience": ["background", "expertise", "history", "track record"],
+    "team": ["squad", "group", "collaborators", "unit"],
+    "develop": ["build", "create", "construct", "engineer"],
+    "manage": ["oversee", "lead", "direct", "supervise"],
+    "responsible for": ["in charge of", "tasked with", "accountable for", "handling"],
+    "collaborate": ["work together", "partner", "cooperate", "liaise"],
+    "design": ["architect", "plan", "model", "structure"],
+    "analyze": ["examine", "assess", "evaluate", "study"],
+    "implement": ["execute", "deploy", "apply", "enact"],
+    "support": ["assist", "help", "aid", "back"],
+    "knowledge": ["understanding", "familiarity", "grasp", "insight"],
+    "communicate": ["convey", "interact", "correspond", "articulate"],
+    "client": ["customer", "partner", "stakeholder", "consumer"],
+    "goal": ["objective", "target", "aim", "milestone"],
+    "proficient": ["skilled", "adept", "capable", "expert"],
+    "ensure": ["guarantee", "make sure", "confirm", "verify"],
+    "opportunity": ["chance", "opening", "prospect", "possibility"],
+    "environment": ["atmosphere", "setting", "culture", "climate"],
+    "skills": ["abilities", "competencies", "talents", "capabilities"]
+};
 
 const rewriteJobDescription = async (originalDescription, jobTitle, company) => {
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        const prompt = `
-      Rewrite the following job description for the position of "${jobTitle}" at "${company}".
-      The new description must be:
-      1.  **100% Unique & Plagiarism-Free**: Completely rephrase the content to ensure it passes plagiarism checks.
-      2.  **SEO Optimized**: Use relevant keywords naturally for better search ranking.
-      3.  **Professional & Engaging**: Use a professional tone that attracts candidates.
-      4.  **Structured**: Use HTML formatting (<h3>, <p>, <ul>, <li>) for readability. Do not use <h1> or <h2>.
-      5.  **Clean**: Remove any "Apply Now" buttons, links, or generic footer text from the original validation.
+        let rewrittenText = originalDescription;
 
-      Original Description:
-      ${originalDescription}
-    `;
+        // 1. Synonym Replacement
+        Object.keys(synonymMap).forEach(word => {
+            const synonyms = synonymMap[word];
+            const replacement = synonyms[Math.floor(Math.random() * synonyms.length)];
+            const regex = new RegExp(`\\b${word}\\b`, "gi"); // Case-insensitive, whole word
+            rewrittenText = rewrittenText.replace(regex, replacement);
+        });
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        return response.text();
+        // 2. Add Introduction
+        const intros = [
+            `<p><strong>${company}</strong> is looking for a talented <strong>${jobTitle}</strong> to join our growing team.</p>`,
+            `<p>Exciting opportunity for a <strong>${jobTitle}</strong> at <strong>${company}</strong>. Apply now to make an impact!</p>`,
+            `<p>Join <strong>${company}</strong> as a <strong>${jobTitle}</strong> and help us build the future.</p>`
+        ];
+        const randomIntro = intros[Math.floor(Math.random() * intros.length)];
+
+        // 3. Add Conclusion
+        const outros = [
+            "<p>If you are passionate about this role, we'd love to hear from you!</p>",
+            "<p>Ready to take the next step in your career? detailed application instructions are below.</p>",
+            "<p>We are an equal opportunity employer and value diversity at our company.</p>"
+        ];
+        const randomOutro = outros[Math.floor(Math.random() * outros.length)];
+
+        return `${randomIntro} ${rewrittenText} ${randomOutro}`;
+
     } catch (error) {
-        console.error("Error rewriting job description with AI:", error.message); // Log message only to reduce noise
-        return originalDescription; // Fallback to original if AI fails
+        console.error("Error manually rewriting job description:", error.message);
+        return originalDescription;
     }
 };
 

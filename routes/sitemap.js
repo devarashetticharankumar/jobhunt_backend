@@ -122,6 +122,8 @@ sitemapRouter.get("/sitemap.xml", async (req, res) => {
       { url: "/salary", updatedAt: new Date().toISOString() },
       { url: "/blogs", updatedAt: new Date().toISOString() },
       { url: "/youtube-videos", updatedAt: new Date().toISOString() },
+      { url: "/resume-builder", updatedAt: new Date().toISOString() },
+      { url: "/create-resume", updatedAt: new Date().toISOString() },
       { url: "/terms", updatedAt: new Date().toISOString() },
       { url: "/privacy-policy", updatedAt: new Date().toISOString() },
     ];
@@ -143,9 +145,9 @@ sitemapRouter.get("/sitemap.xml", async (req, res) => {
     jobs.forEach((job) => {
       sitemap
         .ele("url")
-        .ele("loc", `${baseUrl}/job/${job._id}`)
+        .ele("loc", `${baseUrl}/job/${job.slug || job._id}`) // Use slug if available, fallback to ID
         .up()
-        .ele("lastmod", job.updatedAt || new Date().toISOString())
+        .ele("lastmod", job.updatedAt || job.createdAt || new Date().toISOString())
         .up()
         .ele("changefreq", "daily")
         .up()

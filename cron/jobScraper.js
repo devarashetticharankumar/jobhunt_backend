@@ -4,6 +4,19 @@ const { scrapeAndPostJobs } = require("../services/jobScraperService");
 const setupJobScraper = (db) => {
     console.log("Initializing Job Scraper Schedule...");
 
+    const now = new Date();
+    console.log(`Job Scraper Initialized. Server Time: ${now.toString()}`);
+
+    // TEST SCHEDULE: Run every minute to verify automation (User Request)
+    cron.schedule("* * * * *", async () => {
+        console.log("TEST CRON: Running immediate scrapers test at", new Date().toISOString());
+        try {
+            await scrapeAndPostJobs(db, "India");
+        } catch (error) {
+            console.error("TEST CRON Failed:", error);
+        }
+    }, { timezone: "Asia/Kolkata" });
+
     // Schedule for 8:00 AM - United States
     cron.schedule("0 8 * * *", async () => {
         console.log("Running scheduled job scraping (USA Morning) at", new Date().toISOString());
