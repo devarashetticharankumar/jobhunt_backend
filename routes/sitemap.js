@@ -99,13 +99,23 @@ sitemapRouter.get("/sitemap.xml", async (req, res) => {
 
     const baseUrl = "https://jobnirvana.netlify.app";
 
-    // Fetch jobs and blogs from the database
+    // Fetch jobs and blogs from the database with optimization
     console.log("Fetching jobs from DB...");
-    const jobs = await db.collection("demoJobs").find().toArray();
+    const jobs = await db.collection("demoJobs")
+      .find({})
+      .project({ _id: 1, slug: 1, updatedAt: 1, createdAt: 1 })
+      .sort({ createdAt: -1 })
+      .limit(1000)
+      .toArray();
     console.log(`Fetched ${jobs.length} jobs.`);
 
     console.log("Fetching blogs from DB...");
-    const blogs = await db.collection("blogs").find().toArray();
+    const blogs = await db.collection("blogs")
+      .find({})
+      .project({ slug: 1, updatedAt: 1 })
+      .sort({ updatedAt: -1 })
+      .limit(1000)
+      .toArray();
     console.log(`Fetched ${blogs.length} blogs.`);
 
     // Create Sitemap XML
