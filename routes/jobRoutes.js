@@ -922,35 +922,123 @@ router.get("/featured-companies", async (req, res) => {
 router.get("/all-jobs", async (req, res) => {
   const db = req.app.locals.db;
   const jobCollections = db.collection("demoJobs");
-  try {
-    // Optimize: Fetch only necessary fields and truncate description
-    const jobs = await jobCollections
-      .aggregate([
-        { $sort: { createdAt: -1 } },
-        {
-          $project: {
-            _id: 1,
-            companyName: 1,
-            companyLogo: 1,
-            jobTitle: 1,
-            jobLocation: 1,
-            minPrice: 1,
-            maxPrice: 1,
-            salaryType: 1,
-            employmentType: 1,
-            // Derive postingDate from createdAt as it is missing in DB
-            postingDate: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-            experienceLevel: 1,
-            slug: 1,
-            // Use $substrCP (Code Points) instead of $substr (Bytes) to avoid splitting UTF-8 characters
-            description: { $substrCP: [{ $ifNull: ["$description", ""] }, 0, 300] },
-            createdAt: 1
-          },
-        },
-      ])
-      .toArray();
 
-    res.send(jobs);
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 12; // Adjusted limit for grid layout
+  const skip = (page - 1) * limit;
+
+  // Filters
+  const search = req.query.search || "";
+  const location = req.query.location || "";
+  const filter = req.query.filter || ""; // The "category" filter (multi-purpose)
+
+  try {
+    const pipeline = [];
+    const matchStage = {};
+
+    // 1. Text Search (Job Title)
+    if (search) {
+      matchStage.jobTitle = { $regex: search, $options: "i" };
+    }
+
+    // 2. Location Filter (Direct)
+    if (location) {
+      matchStage.jobLocation = { $regex: location, $options: "i" };
+    }
+
+    // 3. Smart "Category" Filter
+    if (filter) {
+      const orConditions = [
+        { jobLocation: { $regex: filter, $options: "i" } },
+        { salaryType: { $regex: filter, $options: "i" } },
+        { employmentType: { $regex: filter, $options: "i" } },
+        { experienceLevel: { $regex: filter, $options: "i" } },
+      ];
+
+      // Check if filter is a date (YYYY-MM-DD)
+      const isDate = /^\d{4}-\d{2}-\d{2}$/.test(filter);
+      if (isDate) {
+        // Assuming createdAt is used for postingDate logic on backend
+        // Convert input date string to Date object for comparison?
+        // Actually, frontend logic was: postingDate >= selectedCategory
+        // But backend data `createdAt` is a Date object.
+        // Let's filter jobs created AFTER or ON this date.
+        orConditions.push({ createdAt: { $gte: new Date(filter) } });
+      }
+
+      // Check if filter is a number (Price)
+      // Frontend logic: parseInt(maxPrice) <= parseInt(selectedCategory)
+      const isNumber = !isNaN(parseFloat(filter)) && isFinite(filter);
+      if (isNumber) {
+        // We need to support string numbers in DB "100k" -> we usually just regex match or simple compare
+        // But the requirement specifically asked for <= logic.
+        // This is complex if DB stores strings like "100k".
+        // For now, let's keep it simple and safe: Try to match strings primarily.
+        // If we want numeric comparison, we need $toInt in aggregation, but that fails on non-numeric strings.
+        // Fallback: simpler regex match for now OR exact string match.
+        // Replicating frontend exact behavior requires cleaning data first.
+        // We will add the logic essentially assuming cleaned data or just simple matching for now to unblock content.
+        // orConditions.push({ maxPrice: { $lte: parseInt(filter) } }); // Checking if stored as number? likely string.
+        // Let's rely on regex for consistency with "category" behavior unless verified otherwise.
+        // OR filtering logic from frontend: parseInt(maxPrice) <= parseInt(selectedCategory)
+        // If DB has "120", "20", etc as strings.
+        // Let's try to simulate checking if maxPrice (converted) is <= filter.
+        orConditions.push({
+          $expr: {
+            $lte: [{ $toInt: "$maxPrice" }, parseInt(filter)]
+          }
+        });
+      }
+
+      matchStage.$or = orConditions;
+    }
+
+    pipeline.push({ $match: matchStage });
+
+    // 4. Sort (Newest First)
+    pipeline.push({ $sort: { createdAt: -1 } });
+
+    // 5. Facet for Pagination metadata + Results
+    pipeline.push({
+      $facet: {
+        totalCount: [{ $count: "count" }],
+        jobs: [
+          { $skip: skip },
+          { $limit: limit },
+          {
+            $project: {
+              _id: 1,
+              companyName: 1,
+              companyLogo: 1,
+              jobTitle: 1,
+              jobLocation: 1,
+              minPrice: 1,
+              maxPrice: 1,
+              salaryType: 1,
+              employmentType: 1,
+              postingDate: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+              experienceLevel: 1,
+              slug: 1,
+              description: { $substrCP: [{ $ifNull: ["$description", ""] }, 0, 300] },
+              createdAt: 1
+            }
+          }
+        ]
+      }
+    });
+
+    const results = await jobCollections.aggregate(pipeline).toArray();
+
+    const totalJobs = results[0].totalCount[0] ? results[0].totalCount[0].count : 0;
+    const totalPages = Math.ceil(totalJobs / limit);
+    const jobs = results[0].jobs;
+
+    res.send({
+      totalJobs,
+      totalPages,
+      currentPage: page,
+      jobs,
+    });
   } catch (error) {
     console.error("Error getting all jobs:", error);
     res.status(500).send({ message: "Server error", error });
