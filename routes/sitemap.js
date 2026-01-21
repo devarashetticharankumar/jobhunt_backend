@@ -150,6 +150,18 @@ sitemapRouter.get("/sitemap.xml", async (req, res) => {
         .up();
     });
 
+    // Helper to format date to ISO 8601
+    const formatDate = (date) => {
+      if (!date) return new Date().toISOString();
+      try {
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return new Date().toISOString();
+        return d.toISOString();
+      } catch (e) {
+        return new Date().toISOString();
+      }
+    };
+
     // Add Dynamic Job Pages
     console.log("Adding dynamic job pages...");
     jobs.forEach((job) => {
@@ -157,7 +169,7 @@ sitemapRouter.get("/sitemap.xml", async (req, res) => {
         .ele("url")
         .ele("loc", `${baseUrl}/job/${job.slug || job._id}`) // Use slug if available, fallback to ID
         .up()
-        .ele("lastmod", job.updatedAt || job.createdAt || new Date().toISOString())
+        .ele("lastmod", formatDate(job.updatedAt || job.createdAt))
         .up()
         .ele("changefreq", "daily")
         .up()
@@ -172,7 +184,7 @@ sitemapRouter.get("/sitemap.xml", async (req, res) => {
         .ele("url")
         .ele("loc", `${baseUrl}/blog/${blog.slug}`)
         .up()
-        .ele("lastmod", blog.updatedAt || new Date().toISOString())
+        .ele("lastmod", formatDate(blog.updatedAt))
         .up()
         .ele("changefreq", "daily")
         .up()
