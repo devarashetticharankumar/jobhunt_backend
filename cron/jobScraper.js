@@ -11,7 +11,7 @@ const setupJobScraper = (db) => {
     cron.schedule("* * * * *", async () => {
         console.log("TEST CRON: Running immediate scrapers test at", new Date().toISOString());
         try {
-            await scrapeAndPostJobs(db, "India");
+            await scrapeAndPostJobs(db, "United States");
         } catch (error) {
             console.error("TEST CRON Failed:", error);
         }

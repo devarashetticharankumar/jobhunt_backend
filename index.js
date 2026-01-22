@@ -7,7 +7,7 @@ const path = require("path");
 
 dotenv.config();
 const app = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 5001;
 
 // Increase the request body size limit
 app.use(express.json({ limit: "10mb" })); // Adjust the size as needed

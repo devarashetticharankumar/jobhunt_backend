@@ -64,6 +64,52 @@ router.post("/apply", upload.single("resume"), async (req, res) => {
     }
 });
 
+// Track external application click
+router.post("/external-apply", async (req, res) => {
+    const db = req.app.locals.db;
+    const applicationsCollection = db.collection("jobApplications");
+
+    try {
+        const { jobId, jobTitle, companyName, applicantId, applicantName, applicantEmail, postedBy, applyUrl } = req.body;
+
+        // Check if already tracked today to avoid duplicates (optional, but good)
+        // For now, let's just allow it so they can see it in their history even if clicked multiple times, 
+        // or improved: check if exists, if so update 'lastClickedAt'
+        const existing = await applicationsCollection.findOne({
+            jobId: jobId,
+            applicantEmail: applicantEmail,
+            status: "external-click"
+        });
+
+        if (existing) {
+            await applicationsCollection.updateOne(
+                { _id: existing._id },
+                { $set: { appliedAt: new Date() } } // Update time
+            );
+            return res.status(200).json({ message: "Application track updated" });
+        }
+
+        const application = {
+            jobId,
+            jobTitle,
+            companyName,
+            postedBy: postedBy || "External",
+            applicantId,
+            applicantName,
+            applicantEmail,
+            applyUrl,
+            status: "external-click", // Different status for external
+            appliedAt: new Date(),
+        };
+
+        const result = await applicationsCollection.insertOne(application);
+        res.status(201).json({ message: "External application tracked", applicationId: result.insertedId });
+    } catch (error) {
+        console.error("Error tracking application:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
+
 // Get applicants for a specific job (Recruiter view)
 router.get("/job/:jobId", async (req, res) => {
     const db = req.app.locals.db;

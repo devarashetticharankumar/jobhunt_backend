@@ -142,7 +142,7 @@ const scrapeAndPostJobs = async (db, location = "United States") => {
             if (location === "India") {
                 url = "https://www.glassdoor.co.in/Job/india-software-jobs-jobs-SRCH_IL.0,5_IN115_KO6,19.htm?fromAge=1";
             } else {
-                url = "https://www.glassdoor.co.in/Job/united-states-jobs-SRCH_IL.0,13_IN1.htm?fromAge=1";
+                url = "https://www.glassdoor.co.in/Job/united-states-software-jobs-jobs-SRCH_IL.0,13_IN1_KO14,27.htm?fromAge=1";
             }
 
             console.log(`Scraping URL: ${url}`);
