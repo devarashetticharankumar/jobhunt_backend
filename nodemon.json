@@ -1,17 +1,12 @@
 {
-    "watch": [
-        "index.js",
-        "services",
-        "routes",
-        "cron",
-        "models",
-        "validation"
-    ],
-    "ext": "js,json",
+    "events": {
+        "restart": "taskkill /f /im node.exe || exit 0"
+    },
+    "delay": 1500,
+    "pollingInterval": 2000,
+    "legacyWatch": true,
     "ignore": [
         "node_modules",
-        "logs"
-    ],
-    "delay": 1000,
-    "legacyWatch": true
+        ".git"
+    ]
 }

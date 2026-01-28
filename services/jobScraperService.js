@@ -125,7 +125,7 @@ const transformDescription = (
     return { description: cleanDescription, seoJobTitle };
 };
 
-const scrapeAndPostJobs = async (db, location = "United States") => {
+const scrapeAndPostJobs = async (db, targetUrl) => {
     const jobCollections = db.collection("demoJobs");
     const subscriptionsCollection = db.collection("EmailSubscriptions");
     let browser = null;
@@ -175,12 +175,7 @@ const scrapeAndPostJobs = async (db, location = "United States") => {
             await page.setViewport({ width: 1366, height: 768 });
             await page.setDefaultNavigationTimeout(60000);
 
-            let url;
-            if (location === "India") {
-                url = "https://www.glassdoor.co.in/Job/india-software-jobs-jobs-SRCH_IL.0,5_IN115_KO6,19.htm?fromAge=1";
-            } else {
-                url = "https://www.glassdoor.co.in/Job/united-states-software-jobs-jobs-SRCH_IL.0,13_IN1_KO14,27.htm?fromAge=1";
-            }
+            const url = targetUrl;
 
             console.log(`Scraping URL: ${url}`);
 
@@ -256,7 +251,7 @@ const scrapeAndPostJobs = async (db, location = "United States") => {
                         listingLogo: logoElement?.src || null
                     };
                 }).filter(j => j.glassdoorLink && j.jobTitle !== "Untitled Job");
-            }, location);
+            });
 
             if (!rawJobs || rawJobs.length === 0) {
                 console.warn("No jobs found. Possible selector mismatch or block.");
