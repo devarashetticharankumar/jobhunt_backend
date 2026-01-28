@@ -1,0 +1,17 @@
+{
+    "watch": [
+        "index.js",
+        "services",
+        "routes",
+        "cron",
+        "models",
+        "validation"
+    ],
+    "ext": "js,json",
+    "ignore": [
+        "node_modules",
+        "logs"
+    ],
+    "delay": 1000,
+    "legacyWatch": true
+}

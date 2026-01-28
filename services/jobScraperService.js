@@ -33,39 +33,76 @@ const synonymMap = {
 
 const rewriteJobDescription = async (originalDescription, jobTitle, company) => {
     try {
-        let rewrittenText = originalDescription;
+        console.log(`Rewriting (Manual Template): ${jobTitle} at ${company}`);
 
-        // 1. Synonym Replacement
+        // 1. Synonym Replacement (Basic uniqueness)
+        let processedText = originalDescription;
         Object.keys(synonymMap).forEach(word => {
-            const synonyms = synonymMap[word];
-            const replacement = synonyms[Math.floor(Math.random() * synonyms.length)];
-            const regex = new RegExp(`\\b${word}\\b`, "gi"); // Case-insensitive, whole word
-            rewrittenText = rewrittenText.replace(regex, replacement);
+            const synonymsList = synonymMap[word];
+            const replacement = synonymsList[Math.floor(Math.random() * synonymsList.length)];
+            const regex = new RegExp(`\\b${word}\\b`, "gi");
+            processedText = processedText.replace(regex, replacement);
         });
 
-        // 2. Add Introduction
+        // 2. Formatting & cleanup (ensure basic HTML structure if missing)
+        // If text is plain, wrap paragraphs. 
+        if (!processedText.includes("<p>")) {
+            processedText = processedText.split("\n\n").map(p => `<p>${p}</p>`).join("");
+        }
+
+        // 3. Template Sections Construction
+
+        // Introduction
         const intros = [
-            `<p><strong>${company}</strong> is looking for a talented <strong>${jobTitle}</strong> to join our growing team.</p>`,
-            `<p>Exciting opportunity for a <strong>${jobTitle}</strong> at <strong>${company}</strong>. Apply now to make an impact!</p>`,
-            `<p>Join <strong>${company}</strong> as a <strong>${jobTitle}</strong> and help us build the future.</p>`
+            `<h3>About the Role</h3><p><strong>${company}</strong> is currently seeking a driven and talented <strong>${jobTitle}</strong> to join our dynamic team. This is a unique opportunity to make a significant impact in a fast-paced environment.</p>`,
+            `<h3>Job Overview</h3><p>We are looking for a <strong>${jobTitle}</strong> who is passionate about building scalable solutions. At <strong>${company}</strong>, you will work with cutting-edge technologies and a collaborative team.</p>`,
+            `<h3>The Opportunity</h3><p>Join <strong>${company}</strong> as a <strong>${jobTitle}</strong>. We are dedicated to innovation and excellence, and we need someone with your skills to help us reach the next level.</p>`
         ];
         const randomIntro = intros[Math.floor(Math.random() * intros.length)];
 
-        // 3. Add Conclusion
+        // Why Join Us (Generic but professional)
+        const whyJoin = [
+            `<h3>Why Join Us?</h3><ul><li><strong>Growth:</strong> Opportunities for professional development and career advancement.</li><li><strong>Culture:</strong> A supportive, inclusive, and innovative work environment.</li><li><strong>Impact:</strong> Work on projects that touch millions of users.</li><li><strong>Benefits:</strong> Competitive compensation and comprehensive benefits package.</li></ul>`,
+            `<h3>What We Offer</h3><ul><li> Collaborative and flexible work environment.</li><li> Access to the latest tools and technologies.</li><li> Mentorship from industry leaders.</li><li> Competitive salary and performance-based bonuses.</li></ul>`
+        ];
+        const randomWhyJoin = whyJoin[Math.floor(Math.random() * whyJoin.length)];
+
+        // Interview Tips (SEO rich)
+        const interviewTips = [
+            `<h3>Interview Preparation Tips</h3><p>To succeed in the interview for this <strong>${jobTitle}</strong> role, be prepared to discuss your past projects in detail. Highlight your problem-solving skills and your ability to work in a team. Research <strong>${company}</strong>'s values and recent news to show your genuine interest.</p>`,
+            `<h3>How to Stand Out</h3><p>When interviewing at <strong>${company}</strong>, focus on demonstrating your technical proficiency and your adaptability. Be ready to explain <em>why</em> you made specific technical decisions in your previous roles. Soft skills like communication are just as important as your coding ability.</p>`
+        ];
+        const randomTips = interviewTips[Math.floor(Math.random() * interviewTips.length)];
+
+        // Conclusion
         const outros = [
-            "<p>If you are passionate about this role, we'd love to hear from you!</p>",
-            "<p>Ready to take the next step in your career? detailed application instructions are below.</p>",
-            "<p>We are an equal opportunity employer and value diversity at our company.</p>"
+            `<h3>Ready to Apply?</h3><p>If you believe you match the requirements for this <strong>${jobTitle}</strong> position, we encourage you to apply immediately. We look forward to reviewing your application!</p>`,
+            `<h3>Next Steps</h3><p>Don't miss this chance to join <strong>${company}</strong>. Click the apply link to submit your resume and cover letter today.</p>`
         ];
         const randomOutro = outros[Math.floor(Math.random() * outros.length)];
 
-        return `${randomIntro} ${rewrittenText} ${randomOutro}`;
+        // 4. Assemble Final HTML
+        // combine: Intro + Original (Synonymized) Description + Why Join + Tips + Outro
+        const finalHtml = `
+            ${randomIntro}
+            <div class="job-original-description">
+                ${processedText}
+            </div>
+            ${randomWhyJoin}
+            ${randomTips}
+            ${randomOutro}
+        `;
+
+        return finalHtml;
 
     } catch (error) {
-        console.error("Error manually rewriting job description:", error.message);
-        return originalDescription;
+        console.error("Manual Template Generation Failed:", error);
+        return originalDescription; // Safety fallback
     }
 };
+
+// No longer need simpleRewrite/fallback as logic is merged above
+const simpleRewrite = null;
 
 const transformDescription = (
     rawDescription,
@@ -149,22 +186,42 @@ const scrapeAndPostJobs = async (db, location = "United States") => {
 
             // Navigate with simple waiter
             await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
-            await new Promise(r => setTimeout(r, 5000)); // Stabilization delay
 
-            // Check for blocking
-            const title = await page.title();
+            // Initial stabilization
+            await new Promise(r => setTimeout(r, 5000));
+
+            // Check for Cloudflare/Bot detection
+            let title = await page.title();
             console.log(`Page Title: ${title}`);
-            const bodyText = await page.evaluate(() => document.body.innerText).catch(() => "");
-            if (bodyText.includes("Pardon Our Interruption") || title.includes("Human Verification")) {
-                throw new Error("Blocked by Glassdoor");
+
+            if (title.includes("Just a moment") || title.includes("Security Challenge")) {
+                console.log("Detected Cloudflare check. Waiting 20s for verification to complete...");
+                await new Promise(r => setTimeout(r, 20000));
+
+                // Refresh title after wait
+                title = await page.title();
+                console.log(`Page Title after wait: ${title}`);
             }
 
-            // Gentle Scroll
+            const bodyText = await page.evaluate(() => document.body.innerText).catch(() => "");
+            if (bodyText.includes("Pardon Our Interruption") || title.includes("Human Verification") || title.includes("Just a moment")) {
+                // Try one reload if blocked
+                console.log("Still blocked. Attempting one reload...");
+                await page.reload({ waitUntil: "domcontentloaded" });
+                await new Promise(r => setTimeout(r, 10000));
+
+                title = await page.title();
+                if (title.includes("Just a moment")) {
+                    throw new Error("Blocked by Glassdoor (Persistent)");
+                }
+            }
+
+            // Gentle Scroll - Increased to find more jobs
             try {
                 await page.evaluate(async () => {
-                    for (let i = 0; i < 3; i++) {
-                        window.scrollBy(0, 500);
-                        await new Promise(resolve => setTimeout(resolve, 1500));
+                    for (let i = 0; i < 8; i++) { // Increased scroll iterations
+                        window.scrollBy(0, 800);
+                        await new Promise(resolve => setTimeout(resolve, 1000));
                     }
                 });
             } catch (e) { console.warn("Scroll error (ignoring):", e.message); }
@@ -207,7 +264,8 @@ const scrapeAndPostJobs = async (db, location = "United States") => {
             }
 
             console.log(`Discovered ${rawJobs.length} potential jobs.`);
-            const jobsToProcess = rawJobs.slice(0, 15); // Increased to 15
+            // Process ALL discovered jobs instead of limiting to 15
+            const jobsToProcess = rawJobs;
 
             const validatedJobs = [];
 
@@ -309,6 +367,10 @@ const scrapeAndPostJobs = async (db, location = "United States") => {
                 const { error } = jobSchema.validate(finalJob);
                 if (!error) validatedJobs.push(finalJob);
                 else console.warn(`Validation failed for ${finalJob.jobTitle}: ${error.message}`);
+
+                // Rate Limit Prevention: Reduced to 2s for basic politeness since we are no longer using Gemini API
+                console.log("Pacing: Waiting 2 seconds...");
+                await new Promise(resolve => setTimeout(resolve, 2000));
             }
 
             if (validatedJobs.length > 0) {

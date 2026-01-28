@@ -38,6 +38,9 @@ const client = new MongoClient(uri, {
     strict: true,
     deprecationErrors: true,
   },
+  socketTimeoutMS: 60000, // 60s
+  connectTimeoutMS: 60000, // 60s
+  maxPoolSize: 50
 });
 
 // Database connection
