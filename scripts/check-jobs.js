@@ -13,8 +13,14 @@ async function check() {
         const db = client.db("job-portal-db");
         const collection = db.collection("demoJobs");
 
-        const job = await collection.findOne({});
-        console.log("Sample Job:", JSON.stringify(job, null, 2));
+        const count = await collection.countDocuments({});
+        console.log(`Total jobs in demoJobs: ${count}`);
+
+        const jobs = await collection.find({}).sort({ createdAt: -1 }).limit(10).toArray();
+        console.log(`Found ${jobs.length} jobs.`);
+        jobs.forEach((job, i) => {
+            console.log(`Job ${i + 1}: Title: ${job.jobTitle}, Slug: ${job.slug}, Date: ${job.createdAt}`);
+        });
 
     } finally {
         await client.close();

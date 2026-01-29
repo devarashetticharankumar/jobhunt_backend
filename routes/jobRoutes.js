@@ -812,6 +812,7 @@ router.get("/recent-jobs", async (req, res) => {
             experienceLevel: 1,
             slug: 1,
             description: { $substrCP: [{ $ifNull: ["$description", ""] }, 0, 300] },
+            skills: { $ifNull: ["$skills", []] },
             createdAt: 1
           },
         },
@@ -1020,6 +1021,7 @@ router.get("/all-jobs", async (req, res) => {
               experienceLevel: 1,
               slug: 1,
               description: { $substrCP: [{ $ifNull: ["$description", ""] }, 0, 300] },
+              skills: { $ifNull: ["$skills", []] },
               createdAt: 1
             }
           }
@@ -1103,6 +1105,7 @@ router.get("/myJobs/:email", async (req, res) => {
             experienceLevel: 1,
             postingDate: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
             slug: 1,
+            skills: { $ifNull: ["$skills", []] },
             // Minimal description or none? Assuming table view doesn't need description.
             // If needed, truncate massively.
             // description: { $substrCP: [{ $ifNull: ["$description", ""] }, 0, 100] },

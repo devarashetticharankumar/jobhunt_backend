@@ -105,7 +105,7 @@ sitemapRouter.get("/sitemap.xml", async (req, res) => {
       .find({})
       .project({ _id: 1, slug: 1, updatedAt: 1, createdAt: 1 })
       .sort({ createdAt: -1 })
-      .limit(1000)
+      .limit(5000)
       .toArray();
     console.log(`Fetched ${jobs.length} jobs.`);
 
@@ -114,7 +114,7 @@ sitemapRouter.get("/sitemap.xml", async (req, res) => {
       .find({})
       .project({ slug: 1, updatedAt: 1 })
       .sort({ updatedAt: -1 })
-      .limit(1000)
+      .limit(2000)
       .toArray();
     console.log(`Fetched ${blogs.length} blogs.`);
 
