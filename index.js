@@ -85,7 +85,6 @@ const resume = require("./routes/resumeRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
-const rssRoutes = require("./routes/rssRoutes");
 
 app.use("/jobs", jobRoutes);
 app.use("/users", userRoutes);
@@ -97,7 +96,6 @@ app.use("/resumes", resume);
 app.use("/ai", aiRoutes);
 app.use("/applications", applicationRoutes);
 app.use("/reviews", reviewRoutes);
-app.use("/", rssRoutes);
 app.use("/uploads", express.static("uploads")); // Serve uploaded resumes
 
 const { expressjwt: jwt } = require("express-jwt");
