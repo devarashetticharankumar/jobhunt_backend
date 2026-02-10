@@ -18,7 +18,8 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(
   cors({
-    origin: ["https://jobnirvana.netlify.app", "http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174"],
+    origin: ["https://jobnirvana.netlify.app", "http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174", "https://jobnirvana.com"],
+    credentials: true
   })
 );
 // Serve static files from the 'public' directory
