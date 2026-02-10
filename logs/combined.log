@@ -1,0 +1,42 @@
+{"level":"info","message":"Starting job aggregation run...","service":"job-aggregator","timestamp":"2026-02-10 16:57:48"}
+{"level":"info","message":"Fetching from Remotive...","service":"job-aggregator","timestamp":"2026-02-10 16:57:48"}
+{"level":"info","message":"Fetching from Arbeitnow...","service":"job-aggregator","timestamp":"2026-02-10 16:57:50"}
+{"level":"info","message":"Fetching from The Muse...","service":"job-aggregator","timestamp":"2026-02-10 16:57:52"}
+{"level":"info","message":"Fetched 145 raw jobs from APIs","service":"job-aggregator","timestamp":"2026-02-10 16:57:55"}
+{"level":"info","message":"Aggregation run complete. Processed: 139, Skipped: 6","service":"job-aggregator","timestamp":"2026-02-10 16:58:18"}
+{"level":"info","message":"Initializing Job Fetcher Cron System (Every 2 hours)...","service":"job-aggregator","timestamp":"2026-02-10 17:03:53"}
+{"level":"info","message":"Initializing Job Fetcher Cron System (Every 2 hours)...","service":"job-aggregator","timestamp":"2026-02-10 17:10:05"}
+{"level":"info","message":"Initializing Job Fetcher Cron System (Every 2 hours)...","service":"job-aggregator","timestamp":"2026-02-10 17:14:28"}
+{"level":"info","message":"Initializing Job Fetcher Cron System (Every 2 hours)...","service":"job-aggregator","timestamp":"2026-02-10 17:15:32"}
+{"level":"info","message":"Initializing Job Fetcher Cron System (Every 2 hours)...","service":"job-aggregator","timestamp":"2026-02-10 17:16:35"}
+{"level":"info","message":"Initializing Job Fetcher Cron System (Every 2 hours)...","service":"job-aggregator","timestamp":"2026-02-10 17:16:56"}
+{"level":"info","message":"Initializing Job Fetcher Cron System (Every 2 hours)...","service":"job-aggregator","timestamp":"2026-02-10 17:22:31"}
+{"level":"info","message":"Initializing Job Fetcher Cron System (Every 2 hours)...","service":"job-aggregator","timestamp":"2026-02-10 17:24:44"}
+{"level":"info","message":"Initializing Job Fetcher Cron System (Every 2 hours)...","service":"job-aggregator","timestamp":"2026-02-10 17:26:22"}
+{"level":"info","message":"isAdmin check - req.auth: {\n  iss: 'https://dev-ewfdxrmfirxjj38r.us.auth0.com/',\n  sub: 'auth0|66fbe97960151320ca7d7f3b',\n  aud: [\n    'https://dev-ewfdxrmfirxjj38r.us.auth0.com/api/v2/',\n    'https://dev-ewfdxrmfirxjj38r.us.auth0.com/userinfo',\n    [length]: 2\n  ],\n  iat: 1770724563,\n  exp: 1770810963,\n  scope: 'openid profile email',\n  azp: '4elFyDqxmMLWpogObJVCamOuEgjooCWY'\n}","service":"job-aggregator","timestamp":"2026-02-10 17:26:46"}
+{"level":"warn","message":"Admin access denied for: auth0|66fbe97960151320ca7d7f3b","service":"job-aggregator","timestamp":"2026-02-10 17:26:46"}
+{"level":"info","message":"Initializing Job Fetcher Cron System (Every 2 hours)...","service":"job-aggregator","timestamp":"2026-02-10 17:27:26"}
+{"level":"info","message":"isAdmin check - req.auth: {\n  iss: 'https://dev-ewfdxrmfirxjj38r.us.auth0.com/',\n  sub: 'auth0|66fbe97960151320ca7d7f3b',\n  aud: [\n    'https://dev-ewfdxrmfirxjj38r.us.auth0.com/api/v2/',\n    'https://dev-ewfdxrmfirxjj38r.us.auth0.com/userinfo',\n    [length]: 2\n  ],\n  iat: 1770724662,\n  exp: 1770811062,\n  scope: 'openid profile email',\n  azp: '4elFyDqxmMLWpogObJVCamOuEgjooCWY'\n}","service":"job-aggregator","timestamp":"2026-02-10 17:27:38"}
+{"level":"warn","message":"Admin access denied for: auth0|66fbe97960151320ca7d7f3b","service":"job-aggregator","timestamp":"2026-02-10 17:27:38"}
+{"level":"info","message":"Initializing Job Fetcher Cron System (Every 2 hours)...","service":"job-aggregator","timestamp":"2026-02-10 17:28:26"}
+{"level":"info","message":"Initializing Job Fetcher Cron System (Every 2 hours)...","service":"job-aggregator","timestamp":"2026-02-10 17:29:30"}
+{"level":"info","message":"Initializing Job Fetcher Cron System (Every 2 hours)...","service":"job-aggregator","timestamp":"2026-02-10 17:33:13"}
+{"level":"info","message":"Initializing Job Fetcher Cron System (Every 2 hours)...","service":"job-aggregator","timestamp":"2026-02-10 17:34:11"}
+{"level":"info","message":"Starting job aggregation run...","service":"job-aggregator","timestamp":"2026-02-10 17:35:24"}
+{"level":"info","message":"Fetching from Remotive...","service":"job-aggregator","timestamp":"2026-02-10 17:35:24"}
+{"level":"info","message":"Fetching from Arbeitnow...","service":"job-aggregator","timestamp":"2026-02-10 17:35:26"}
+{"level":"info","message":"Fetching from The Muse...","service":"job-aggregator","timestamp":"2026-02-10 17:35:29"}
+{"level":"info","message":"Fetched 145 raw jobs from APIs","service":"job-aggregator","timestamp":"2026-02-10 17:35:31"}
+{"level":"info","message":"Aggregation run complete. Processed: 20, Skipped: 125","service":"job-aggregator","timestamp":"2026-02-10 17:35:52"}
+{"level":"info","message":"Starting job aggregation run...","service":"job-aggregator","timestamp":"2026-02-10 17:54:15"}
+{"level":"info","message":"Fetching from Remotive...","service":"job-aggregator","timestamp":"2026-02-10 17:54:15"}
+{"level":"info","message":"Fetching from Arbeitnow...","service":"job-aggregator","timestamp":"2026-02-10 17:54:17"}
+{"level":"info","message":"Fetching from The Muse...","service":"job-aggregator","timestamp":"2026-02-10 17:54:19"}
+{"level":"info","message":"Fetched 145 raw jobs from APIs","service":"job-aggregator","timestamp":"2026-02-10 17:54:20"}
+{"level":"info","message":"Aggregation run complete. Processed: 0, Skipped: 145","service":"job-aggregator","timestamp":"2026-02-10 17:54:29"}
+{"level":"info","message":"Starting job aggregation run...","service":"job-aggregator","timestamp":"2026-02-10 18:00:00"}
+{"level":"info","message":"Fetching from Remotive...","service":"job-aggregator","timestamp":"2026-02-10 18:00:01"}
+{"level":"info","message":"Fetching from Arbeitnow...","service":"job-aggregator","timestamp":"2026-02-10 18:00:01"}
+{"level":"info","message":"Fetching from The Muse...","service":"job-aggregator","timestamp":"2026-02-10 18:00:03"}
+{"level":"info","message":"Fetched 145 raw jobs from APIs","service":"job-aggregator","timestamp":"2026-02-10 18:00:04"}
+{"level":"info","message":"Aggregation run complete. Processed: 0, Skipped: 145","service":"job-aggregator","timestamp":"2026-02-10 18:00:20"}

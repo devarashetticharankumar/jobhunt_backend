@@ -16,10 +16,9 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
 // Middleware
 app.use(bodyParser.json());
 app.use(express.json());
-app.use(cors());
 app.use(
   cors({
-    origin: ["https://jobnirvana.netlify.app", "http://localhost:5173"],
+    origin: ["https://jobnirvana.netlify.app", "http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174"],
   })
 );
 // Serve static files from the 'public' directory
@@ -46,6 +45,7 @@ const client = new MongoClient(uri, {
 // Database connection
 let db;
 const setupJobAlerts = require("./cron/jobAlerts");
+const { setupJobFetcher } = require("./cron/jobFetcher");
 
 async function connectDB() {
   try {
@@ -57,6 +57,7 @@ async function connectDB() {
 
     // Initialize Cron Jobs
     setupJobAlerts(db);
+    setupJobFetcher(db);
 
   } catch (error) {
     console.error("Failed to connect to MongoDB:", error);
@@ -122,7 +123,7 @@ app.get("/", (req, res) => {
 
 // Start server immediately/after attempt, don't wait for success
 connectDB().finally(() => {
-  app.listen(port, () => {
-    console.log(`App listening on port ${port}`);
+  app.listen(port, "0.0.0.0", () => {
+    console.log(`App listening on port ${port} at 0.0.0.0`);
   });
 });

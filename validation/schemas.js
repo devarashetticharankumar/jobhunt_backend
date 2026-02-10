@@ -18,6 +18,14 @@ const jobSchema = Joi.object({
   skills: Joi.array().items(Joi.any().allow(null)),
   slug: Joi.string(),
   glassdoorLink: Joi.string().uri().optional(),
+
+  // Aggregator Metadata
+  externalId: Joi.string().optional(),
+  source: Joi.string().optional(),
+  originalUrl: Joi.string().uri().optional(),
+  shortDescription: Joi.string().max(500).optional(),
+  expiresAt: Joi.date().optional(),
+
   // Slug is optional but must follow the format if provided
 });
 

@@ -687,4 +687,108 @@ router.patch("/update-job/:id", checkJwt, validate(jobSchema), async (req, res) 
   }
 });
 
+
+// Click-tracking redirect
+router.get("/redirect/:id", async (req, res) => {
+  const db = req.app.locals.db;
+  const jobCollections = db.collection("demoJobs");
+  const { id } = req.params;
+
+  try {
+    console.log(`Redirect attempt for ID: ${id}`);
+    const result = await jobCollections.findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $inc: { clicks: 1 } },
+      { returnDocument: "after" }
+    );
+
+    // MongoDB Node driver v6 findOneAndUpdate returns the document directly
+    const job = result;
+
+    if (job && (job.originalUrl || job.ApplyLink)) {
+      let targetUrl = job.originalUrl || job.ApplyLink;
+      console.log(`Found job: ${job.jobTitle}, redirecting to: ${targetUrl}`);
+
+      // Ensure URL has a protocol
+      if (!/^https?:\/\//i.test(targetUrl)) {
+        targetUrl = 'https://' + targetUrl;
+      }
+
+      res.redirect(targetUrl);
+    } else {
+      console.warn(`Job or redirect URL not found for ID: ${id}`);
+      res.status(404).send("Job or redirect URL not found");
+    }
+  } catch (error) {
+    console.error("Redirect error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// Admin Aggregator Routes
+const { runFetcher } = require("../cron/jobFetcher");
+
+const logger = require("../utils/logger");
+
+const isAdmin = (req, res, next) => {
+  // Whitelist based on specific Auth0 sub ID or email claim
+  const userEmail = req.auth?.email || req.auth?.["https://jobnirvana.com/email"];
+  const sub = req.auth?.sub;
+
+  const adminSub = "auth0|66fbe97960151320ca7d7f3b";
+  const adminEmail = "jobhunt2580@gmail.com";
+
+  if (req.auth && (sub === adminSub || userEmail === adminEmail)) {
+    next();
+  } else {
+    logger.warn("Admin access denied for: %s", userEmail || sub);
+    res.status(403).json({ message: "Admin access required" });
+  }
+};
+
+router.get("/admin/aggregator/stats", checkJwt, isAdmin, async (req, res) => {
+  const db = req.app.locals.db;
+  const jobCollections = db.collection("demoJobs");
+  try {
+    const stats = await jobCollections.aggregate([
+      { $match: { source: { $exists: true } } },
+      { $group: { _id: "$source", count: { $sum: 1 } } }
+    ]).toArray();
+
+    const totalJobs = await jobCollections.countDocuments({});
+    const aggregatedJobs = stats.reduce((acc, curr) => acc + curr.count, 0);
+
+    res.json({
+      totalJobs,
+      aggregatedJobs,
+      bySource: stats
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching stats", error: error.message });
+  }
+});
+
+router.post("/admin/aggregator/trigger", checkJwt, isAdmin, async (req, res) => {
+  const db = req.app.locals.db;
+  try {
+    // Run in background
+    runFetcher(db);
+    res.json({ message: "Aggregator triggered successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error triggering aggregator", error: error.message });
+  }
+});
+
+router.post("/admin/aggregator/cleanup", checkJwt, isAdmin, async (req, res) => {
+  const db = req.app.locals.db;
+  try {
+    const result = await db.collection("demoJobs").deleteMany({
+      expiresAt: { $lt: new Date() }
+    });
+    res.json({ message: `Cleanup complete. Deleted ${result.deletedCount} expired jobs.` });
+  } catch (error) {
+    res.status(500).json({ message: "Error running cleanup", error: error.message });
+  }
+});
+
 module.exports = router;
