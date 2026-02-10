@@ -98,22 +98,7 @@ app.use("/applications", applicationRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/uploads", express.static("uploads")); // Serve uploaded resumes
 
-const { expressjwt: jwt } = require("express-jwt");
-const jwksRsa = require("jwks-rsa");
-
-const checkJwt = jwt({
-  secret: jwksRsa.expressJwtSecret({
-    cache: true,
-    rateLimit: true,
-    jwksRequestsPerMinute: 5,
-    jwksUri: process.env.JWKSURI,
-  }),
-  audience: process.env.AUDIENCE,
-  issuer: process.env.ISSUER,
-  algorithms: ["RS256"],
-});
-
-// app.use(checkJwt); // Removed global checkJwt as it applies to all routes unexpectedly
+// Auth0 middleware moved to middleware/auth.js
 
 // Global Error Handler
 app.use((err, req, res, next) => {

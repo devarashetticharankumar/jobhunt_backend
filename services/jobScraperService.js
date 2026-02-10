@@ -7,97 +7,118 @@ const { jobSchema } = require("../validation/schemas");
 
 puppeteer.use(StealthPlugin());
 
-// Synonym Map for Manual Rewriting
-const synonymMap = {
-    "required": ["essential", "needed", "mandatory", "vital"],
-    "experience": ["background", "expertise", "history", "track record"],
-    "team": ["squad", "group", "collaborators", "unit"],
-    "develop": ["build", "create", "construct", "engineer"],
-    "manage": ["oversee", "lead", "direct", "supervise"],
-    "responsible for": ["in charge of", "tasked with", "accountable for", "handling"],
-    "collaborate": ["work together", "partner", "cooperate", "liaise"],
-    "design": ["architect", "plan", "model", "structure"],
-    "analyze": ["examine", "assess", "evaluate", "study"],
-    "implement": ["execute", "deploy", "apply", "enact"],
-    "support": ["assist", "help", "aid", "back"],
-    "knowledge": ["understanding", "familiarity", "grasp", "insight"],
-    "communicate": ["convey", "interact", "correspond", "articulate"],
-    "client": ["customer", "partner", "stakeholder", "consumer"],
-    "goal": ["objective", "target", "aim", "milestone"],
-    "proficient": ["skilled", "adept", "capable", "expert"],
-    "ensure": ["guarantee", "make sure", "confirm", "verify"],
-    "opportunity": ["chance", "opening", "prospect", "possibility"],
-    "environment": ["atmosphere", "setting", "culture", "climate"],
-    "skills": ["abilities", "competencies", "talents", "capabilities"]
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
+
+// Manual Template Libraries for Plagiarism-Free Content (>700 Words)
+const templates = {
+    about: [
+        "The modern professional landscape is constantly evolving, requiring dedicated individuals who can adapt and thrive in dynamic settings. This specific role offers a comprehensive platform for high-impact contributions and professional excellence. At its core, the position is designed for those who possess a deep-seated passion for innovation and a meticulous approach to problem-solving. Joining this team means becoming part of a forward-thinking culture that values integrity, collaboration, and the pursuit of industry-leading standards. The successful candidate will find themselves immersed in a professional environment that encourages creative thinking and rewards initiative. We believe that true growth stems from a combination of technical proficiency and the ability to view challenges from multiple perspectives. This role is not just a job; it is a significant step in a career journey designed for those who aim to make a tangible difference in their respective field. Every day presents new opportunities to refine skills, engage with talented peers, and contribute to projects that have a lasting influence. The commitment to excellence is reflected in every aspect of the organizational structure, providing a stable yet exciting foundation for long-term career satisfaction.",
+        "Navigating the complexities of today's market requires a unique blend of expertise and adaptability. We are currently seeking a professional who embodies these traits and is ready to take on a role that is both challenging and rewarding. This position is strategically positioned to drive meaningful results while offering the individual ample room for personal and professional development. The organizational philosophy centers on the belief that diverse perspectives lead to the most effective solutions. In this role, you will be empowered to explore new ideas, implement efficient processes, and collaborate with a group of like-minded experts. The work environment is characterized by a high degree of mutual respect and a collective drive toward achieving ambitious milestones. We prioritize a culture where open communication and continuous learning are the norm, rather than the exception. By joining our team, you are entering a space where your contributions are recognized and your potential is nurtured. This is an invitation to bring your expertise to a firm that is dedicated to setting new benchmarks in quality and innovation within the industry.",
+        "In an era where industry standards are constantly being redefined, the need for skilled and motivated professionals has never been greater. This role provides a unique vantage point from which to influence key outcomes and contribute to the broader success of the organization. We are looking for an individual who is not only technically capable but also aligns with a culture of excellence and high-performance standards. The responsibilities inherent in this position require a balanced approach, combining strategic oversight with tactical execution. Our workplace is designed to foster professional maturity and encourage individuals to take ownership of their professional trajectory. We understand that the most successful projects are the result of collective effort and shared vision. Consequently, the workspace is highly collaborative, emphasizing the importance of team synergy and effective communication. By choosing to apply for this role, you are signaling your readiness to engage with complex tasks and contribute to a legacy of professional achievement. We are committed to providing the resources and support necessary for you to excel and reach your full career potential."
+    ],
+    growth: [
+        "Professional development is a cornerstone of a fulfilling career, and this organization is deeply committed to the long-term growth of its members. We provide a structured yet flexible path for advancement, ensuring that every individual has the opportunity to expand their horizons. Through a combination of internal mentorship and access to specialized training resources, we empower our employees to stay at the cutting edge of industry trends. The career trajectory here is designed to reward merit and proactive leadership, offering a clear roadmap for those who aspire to senior roles. We believe that when our people grow, the organization grows as well, making personal development a mutual priority.",
+        "The journey toward professional mastery is paved with continuous learning and the courage to take on new challenges. Within our framework, career advancement is seen as a natural progression of consistent excellence and a dedication to self-improvement. We offer numerous avenues for skill enhancement, ranging from collaborative workshops to independent study support. Our performance feedback mechanisms are designed to be constructive and forward-looking, helping individuals identify areas for improvement and celebrate their successes. This is an environment where curiosity is encouraged and the pursuit of knowledge is viewed as a vital component of professional identity.",
+        "Success in the modern workplace is often defined by one's ability to evolve alongside the industry. Our organization fosters a culture of lifelong learning, providing the infrastructure needed for individuals to pivot and adapt as the market shifts. From internal project leads to specialized technical tracks, the opportunities for progression are diverse and tailored to individual strengths. We prioritize internal mobility, preferring to cultivate and promote talent from within our own ranks. This commitment to our workforce ensures a high degree of stability and a shared sense of purpose, making every contribution a building block for future leadership."
+    ],
+    insights: [
+        "Staying competitive in today's workforce requires more than just technical skill; it necessitates an understanding of broader market dynamics and the ability to anticipate future needs. Professionals who succeed are those who maintain a proactive stance toward industry news and technological breakthroughs. Networking and cross-functional collaboration remain essential components of a successful career strategy, as they provide diverse perspectives that are essential for high-level problem solving. Furthermore, the integration of soft skills—such as emotional intelligence and effective communication—is increasingly becoming the differentiator for top-tier talent in every sector. Understanding the intersection of technology and human intuition is becoming a cornerstone of modern professional success.",
+        "The rise of digital transformation has fundamentally altered the way we approach work, emphasizing the importance of agility and technological fluency. To thrive in this environment, individuals must be comfortable working with a variety of digital tools and platforms while maintaining a focus on core professional principles. Resilience and the ability to manage change are now considered critical competencies for any high-growth role. As organizations become more data-driven, the capacity to interpret complex information and translate it into actionable strategies is a skill that continues to see incredible demand across all major industries. Navigating these changes requires a commitment to lifelong learning and a flexible mindset.",
+        "Industry experts agree that the future of work will be characterized by a hybrid approach to problem solving, blending human creativity with automated efficiency. This shift requires professionals to redefine their roles and focus on areas where human intuition and ethical judgment are irreplaceable. Continuous professional education is no longer optional but a fundamental requirement for those who wish to remain relevant. Building a personal brand centered on reliability, expertise, and a commitment to quality is the most effective way to ensure long-term career security in an increasingly competitive global marketplace. Mastering the nuances of professional collaboration is key to long-term stability."
+    ],
+    tips: [
+        "To maximize your success in the interview process for this role, we recommend focusing on your ability to articulate complex technical concepts to non-technical stakeholders. Prepare specific examples from your past projects where you demonstrated leadership or innovative thinking. Researching the organization's recent market performance and strategic goals will also provide you with a significant advantage during discussions. Remember that soft skills and cultural alignment are often weighed as heavily as technical credentials in high-impact professional environments. Consistency and preparation are your strongest tools for landing a premier position.",
+        "When preparing for a role of this caliber, it is essential to emphasize your commitment to quality and efficient process management. Highlighting your experience with collaborative tools and your approach to cross-team synergy will resonate well with hiring managers. We also suggest reviewing common industry-standard problem-solving frameworks to demonstrate your methodical approach to challenges. A successful candidate is often one who can show a balance between independent initiative and the ability to follow established organizational protocols. Your professional narrative should reflect a trajectory of steady growth and increased responsibility."
+    ]
+};
+
+const phraseScrambler = (points) => {
+    const starters = [
+        "Individuals in this role will be expected to",
+        "The primary focus involves the ability to",
+        "Successful candidates will demonstrate a capacity to",
+        "Key duties include the requirement to",
+        "A fundamental aspect of the position is to",
+        "The team relies on the professional's ability to",
+        "Core expectations center around the need to"
+    ];
+    return points.map((p, i) => {
+        const cleanPoint = p.replace(/^[•\-\*\d\.\s]+/, '').trim();
+        const starter = starters[i % starters.length];
+        return `<li><strong>${starter}:</strong> ${cleanPoint}</li>`;
+    }).join("");
 };
 
 const rewriteJobDescription = async (originalDescription, jobTitle, company) => {
     try {
-        console.log(`Rewriting (Manual Template): ${jobTitle} at ${company}`);
+        console.log(`Generating Manual Content: ${jobTitle} at ${company}`);
 
-        // 1. Synonym Replacement (Basic uniqueness)
-        let processedText = originalDescription;
-        Object.keys(synonymMap).forEach(word => {
-            const synonymsList = synonymMap[word];
-            const replacement = synonymsList[Math.floor(Math.random() * synonymsList.length)];
-            const regex = new RegExp(`\\b${word}\\b`, "gi");
-            processedText = processedText.replace(regex, replacement);
-        });
+        // 1. Extract specific information (if any available from original)
+        // This expects the scraper to have passed cleaner bits, but we handle raw too
+        const findBullets = (text) => {
+            let matches = text.match(/<li>(.*?)<\/li>/gi) || text.match(/[•\-\*]\s*(.*?)(?=\n|<br|$)/gi) || [];
+            if (matches.length === 0 && text.length > 30) {
+                // Fallback: Split by sentences or breaks if no explicit HTML bullets
+                matches = text.split(/[.!?\n]\s*/).filter(s => s.trim().length > 15).slice(0, 15);
+            }
+            return matches.map(m => m.replace(/<\/?[^>]+(>|$)/g, "").replace(/^[•\-\*\s]+/, "").trim()).filter(m => m.length > 5);
+        };
 
-        // 2. Formatting & cleanup (ensure basic HTML structure if missing)
-        // If text is plain, wrap paragraphs. 
-        if (!processedText.includes("<p>")) {
-            processedText = processedText.split("\n\n").map(p => `<p>${p}</p>`).join("");
-        }
+        const allBullets = findBullets(originalDescription);
+        const responsibilities = allBullets.slice(0, 7);
+        const qualifications = allBullets.slice(7, 14);
 
-        // 3. Template Sections Construction
+        // 2. Select Templates
+        const randomAbout = templates.about[Math.floor(Math.random() * templates.about.length)];
+        const randomGrowth = templates.growth[Math.floor(Math.random() * templates.growth.length)];
+        const randomInsights = templates.insights[Math.floor(Math.random() * templates.insights.length)];
+        const extraInsights = templates.insights[(Math.floor(Math.random() * templates.insights.length) + 1) % templates.insights.length];
+        const randomTips = templates.tips[Math.floor(Math.random() * templates.tips.length)];
 
-        // Introduction
-        const intros = [
-            `<h3>About the Role</h3><p><strong>${company}</strong> is currently seeking a driven and talented <strong>${jobTitle}</strong> to join our dynamic team. This is a unique opportunity to make a significant impact in a fast-paced environment.</p>`,
-            `<h3>Job Overview</h3><p>We are looking for a <strong>${jobTitle}</strong> who is passionate about building scalable solutions. At <strong>${company}</strong>, you will work with cutting-edge technologies and a collaborative team.</p>`,
-            `<h3>The Opportunity</h3><p>Join <strong>${company}</strong> as a <strong>${jobTitle}</strong>. We are dedicated to innovation and excellence, and we need someone with your skills to help us reach the next level.</p>`
-        ];
-        const randomIntro = intros[Math.floor(Math.random() * intros.length)];
+        // 3. Construct Sections
+        const section1 = `<h3>About This Role</h3><p>${randomAbout}</p>`;
 
-        // Why Join Us (Generic but professional)
-        const whyJoin = [
-            `<h3>Why Join Us?</h3><ul><li><strong>Growth:</strong> Opportunities for professional development and career advancement.</li><li><strong>Culture:</strong> A supportive, inclusive, and innovative work environment.</li><li><strong>Impact:</strong> Work on projects that touch millions of users.</li><li><strong>Benefits:</strong> Competitive compensation and comprehensive benefits package.</li></ul>`,
-            `<h3>What We Offer</h3><ul><li> Collaborative and flexible work environment.</li><li> Access to the latest tools and technologies.</li><li> Mentorship from industry leaders.</li><li> Competitive salary and performance-based bonuses.</li></ul>`
-        ];
-        const randomWhyJoin = whyJoin[Math.floor(Math.random() * whyJoin.length)];
+        const respList = responsibilities.length >= 5 ? phraseScrambler(responsibilities) :
+            phraseScrambler(["Collaborate with cross-functional teams to deliver high-quality results.", "Analyze complex requirements and translate them into actionable tasks.", "Maintain high standards of documentation and process integrity.", "Support ongoing project initiatives through proactive communication.", "Identify and implement process improvements for increased efficiency."]);
+        const section2 = `<h3>Key Responsibilities</h3><ul>${respList}</ul>`;
 
-        // Interview Tips (SEO rich)
-        const interviewTips = [
-            `<h3>Interview Preparation Tips</h3><p>To succeed in the interview for this <strong>${jobTitle}</strong> role, be prepared to discuss your past projects in detail. Highlight your problem-solving skills and your ability to work in a team. Research <strong>${company}</strong>'s values and recent news to show your genuine interest.</p>`,
-            `<h3>How to Stand Out</h3><p>When interviewing at <strong>${company}</strong>, focus on demonstrating your technical proficiency and your adaptability. Be ready to explain <em>why</em> you made specific technical decisions in your previous roles. Soft skills like communication are just as important as your coding ability.</p>`
-        ];
-        const randomTips = interviewTips[Math.floor(Math.random() * interviewTips.length)];
+        const qualList = qualifications.length >= 5 ? phraseScrambler(qualifications) :
+            phraseScrambler(["Relevant educational background or equivalent professional experience.", "Demonstrated history of success in similar high-performance roles.", "Excellent communication and interpersonal relationship skills.", "Proven ability to manage multiple priorities in a fast-paced environment.", "Strong analytical and problem-solving capabilities."]);
+        const section3 = `<h3>Required Qualifications</h3><ul>${qualList}</ul>`;
 
-        // Conclusion
-        const outros = [
-            `<h3>Ready to Apply?</h3><p>If you believe you match the requirements for this <strong>${jobTitle}</strong> position, we encourage you to apply immediately. We look forward to reviewing your application!</p>`,
-            `<h3>Next Steps</h3><p>Don't miss this chance to join <strong>${company}</strong>. Click the apply link to submit your resume and cover letter today.</p>`
-        ];
-        const randomOutro = outros[Math.floor(Math.random() * outros.length)];
+        const section4 = `<h3>Work Environment & Growth</h3><p>${randomGrowth}</p>`;
 
-        // 4. Assemble Final HTML
-        // combine: Intro + Original (Synonymized) Description + Why Join + Tips + Outro
-        const finalHtml = `
-            ${randomIntro}
-            <div class="job-original-description">
-                ${processedText}
-            </div>
-            ${randomWhyJoin}
-            ${randomTips}
-            ${randomOutro}
+        const section5 = `<h3>Industry Perspectives & Success Strategy</h3><p>${randomInsights}</p><p>${extraInsights}</p>`;
+
+        const section6 = `<h3>Success Strategy & Interview Tips</h3><p>${randomTips}</p>`;
+
+        // 4. Attribution
+        const attribution = `<div style="margin-top: 30px; padding: 15px; background: #f9f9f9; border-left: 4px solid #007bff; font-style: italic;">
+            This job listing is sourced from publicly available job postings. Please verify full details on the official employer website.
+        </div>`;
+
+        // Assemble
+        const fullContent = `
+            ${section1}
+            ${section2}
+            ${section3}
+            ${section4}
+            ${section5}
+            ${section6}
+            ${attribution}
         `;
 
-        return finalHtml;
+        return fullContent;
 
     } catch (error) {
-        console.error("Manual Template Generation Failed:", error);
-        return originalDescription; // Safety fallback
+        console.error("Manual Content Generation Failed:", error);
+        return originalDescription;
     }
 };
 
@@ -297,34 +318,37 @@ const scrapeAndPostJobs = async (db, targetUrl) => {
                     await detailPage.goto(job.glassdoorLink, { waitUntil: "domcontentloaded", timeout: 45000 });
                     await new Promise(r => setTimeout(r, 2000));
 
-                    // Extract Details
+                    // Selective Scraper: Extract only important bullet points
                     const details = await detailPage.evaluate(() => {
+                        const descriptionNode = document.querySelector("div[class*='jobDescription'], div[class*='desc'], .jobDescriptionContent");
+                        if (!descriptionNode) return { description: "", employmentType: "Full-time", experienceLevel: "Mid-Level", salaryRange: null };
+
+                        // Find all bullet points as "Important Information"
+                        const bullets = Array.from(descriptionNode.querySelectorAll("li")).map(li => li.innerText.trim()).filter(t => t.length > 5);
+
                         return {
-                            description: document.querySelector("div[class*='jobDescription'], div[class*='desc'], .jobDescriptionContent")?.innerHTML || "",
+                            description: bullets.length > 0 ? bullets.join("\n") : (descriptionNode.innerText.length > 10 ? descriptionNode.innerText.substring(0, 2000) : ""), // Pass text if no bullets
                             employmentType: document.querySelector("div[class*='employment'], span[class*='type']")?.innerText || "Full-time",
                             experienceLevel: document.querySelector("div[class*='experience'], span[class*='level']")?.innerText || "Mid-Level",
                             salaryRange: document.querySelector("div[class*='salary'], span[class*='salary']")?.innerText || null,
-                            // Try to get logo from detail page if listing one was null
                             companyLogo: document.querySelector("img[class*='logo'], img[class*='avatar']")?.src || null
                         };
                     });
 
                     await detailPage.close();
 
-                    // If description exists, rewrite it
-                    if (details.description) {
-                        console.log(`Rewriting: ${job.jobTitle}`);
-                        const aiDescription = await rewriteJobDescription(details.description, job.jobTitle, job.companyName);
-                        finalJob.description = aiDescription;
+                    // Generate description (Always generate if we have a job title)
+                    console.log(`Generating Description for: ${job.jobTitle}`);
+                    const manualDescription = await rewriteJobDescription(details.description || "", job.jobTitle, job.companyName);
 
-                        const { seoJobTitle } = transformDescription(
-                            aiDescription, job.jobTitle, job.jobLocation, job.companyName,
-                            details.employmentType, details.experienceLevel, details.salaryRange, []
-                        );
-                        finalJob.jobTitle = seoJobTitle;
-                    } else {
-                        finalJob.description = "Full details available at application link.";
-                    }
+                    // Finalize the description
+                    finalJob.description = manualDescription;
+
+                    const { seoJobTitle } = transformDescription(
+                        finalJob.description, job.jobTitle, job.jobLocation, job.companyName,
+                        details.employmentType, details.experienceLevel, details.salaryRange, []
+                    );
+                    finalJob.jobTitle = seoJobTitle;
 
                     // Prioritize detail logo, then listing logo, then fallback
                     finalJob.companyLogo = details.companyLogo || job.listingLogo || "https://jobnirvana.netlify.app/images/logo.png";
@@ -379,11 +403,19 @@ const scrapeAndPostJobs = async (db, targetUrl) => {
                     const sampleJob = validatedJobs[0];
                     let mailOptions = {
                         from: process.env.EMAIL_USERNAME,
-                        to: subscriberEmails,
-                        subject: `New Job: ${sampleJob.jobTitle}`,
-                        html: `<h1>New Job Alert</h1><p>${sampleJob.jobTitle} at ${sampleJob.companyName}</p>`
+                        to: subscriberEmails.join(", "), // Join to send to all Bcc or multiple To
+                        subject: `New Job Alert: ${sampleJob.jobTitle}`,
+                        html: `<h3>New Opportunities Discovered</h3>
+                               <p><strong>${sampleJob.jobTitle}</strong> at <strong>${sampleJob.companyName}</strong></p>
+                               <p>We've just listed new high-quality job opportunities matched to your preferences.</p>
+                               <a href="https://jobnirvana.netlify.app/job/${sampleJob.slug}" style="padding: 10px 20px; background: #2563eb; color: white; text-decoration: none; border-radius: 5px;">View Job Details</a>`
                     };
-                    try { await transporter.sendMail(mailOptions); } catch (e) { }
+                    try {
+                        await transporter.sendMail(mailOptions);
+                        console.log(`Email alerts sent to ${subscriberEmails.length} subscribers.`);
+                    } catch (e) {
+                        console.error("Failed to send email alerts:", e.message);
+                    }
                 }
             }
 
