@@ -267,31 +267,47 @@ router.post("/postjob", checkJwt, validate(jobSchema), async (req, res) => {
       body.slug = `${baseSlug}-${new ObjectId().toString().slice(-6)}`;
     }
 
+    console.log("Saving job to database...");
     const result = await jobCollections.insertOne(body);
+    console.log("Job saved successfully:", result.insertedId);
 
-    const subscribers = await subscriptionsCollection.find({}).toArray();
-    const subscriberEmails = subscribers.map((subscriber) => subscriber.email);
+    // Send email notification (Decoupled from main response)
+    (async () => {
+      try {
+        console.log("Fetching subscribers for email notification...");
+        const subscribers = await subscriptionsCollection.find({}).toArray();
+        const subscriberEmails = subscribers.map((subscriber) => subscriber.email);
 
-    let mailOptions = {
-      from: process.env.EMAIL_USERNAME,
-      to: subscriberEmails,
-      subject: "New Job Posted!",
-      text: `Hi there! A new job has been posted that might interest you: ${body.jobTitle}`,
-      html: `
-        <h1>New Job Opportunity: ${body.jobTitle}</h1>
-        <h2>Company: ${body.companyName}</h2>
-        <img src="${body.companyLogo}" alt="${body.companyName} Logo" style="max-width: 100%; height: auto;">
-        <div>${body.description}</div>
-        <p>For more details, visit our website at <a href="https://jobnirvana.netlify.app/job/${result.insertedId}" target="_blank">JobNirvana</a>.</p>
-      `,
-    };
+        if (subscriberEmails.length > 0) {
+          let mailOptions = {
+            from: process.env.EMAIL_USERNAME,
+            to: subscriberEmails,
+            subject: "New Job Posted!",
+            text: `Hi there! A new job has been posted that might interest you: ${body.jobTitle}`,
+            html: `
+              <h1>New Job Opportunity: ${body.jobTitle}</h1>
+              <h2>Company: ${body.companyName}</h2>
+              <img src="${body.companyLogo}" alt="${body.companyName} Logo" style="max-width: 100%; height: auto;">
+              <div>${body.description}</div>
+              <p>For more details, visit our website at <a href="https://jobnirvana.netlify.app/job/${result.insertedId}" target="_blank">JobNirvana</a>.</p>
+            `,
+          };
 
-    await transporter.sendMail(mailOptions);
-    console.log("Email sent");
+          console.log("Sending emails to", subscriberEmails.length, "subscribers...");
+          await transporter.sendMail(mailOptions);
+          console.log("Email notification sent successfully");
+        } else {
+          console.log("No subscribers found, skipping email notification");
+        }
+      } catch (emailError) {
+        console.error("Failed to send email notification:", emailError);
+      }
+    })();
+
     res.status(200).send(result);
   } catch (error) {
-    console.error("Error posting job:", error);
-    res.status(500).send({ message: "Server error", error });
+    console.error("Critical error in /postjob route:", error);
+    res.status(500).send({ message: "Server error", error: error.message || error });
   }
 });
 

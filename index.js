@@ -100,9 +100,14 @@ app.use("/uploads", express.static("uploads")); // Serve uploaded resumes
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-  console.error("Unhandled Error:", err);
+  console.error("--- Unhandled Error ---");
+  console.error("Name:", err.name);
+  console.error("Message:", err.message);
+  console.error("Stack:", err.stack);
+  console.error("-----------------------");
+
   if (err.name === "UnauthorizedError") {
-    return res.status(401).json({ message: "Invalid or missing token" });
+    return res.status(401).json({ message: "Invalid or missing token", error: err.message });
   }
   res.status(500).json({ message: "Internal Server Error", error: err.message });
 });
