@@ -46,7 +46,6 @@ const client = new MongoClient(uri, {
 // Database connection
 let db;
 const setupJobAlerts = require("./cron/jobAlerts");
-const setupJobScraper = require("./cron/jobScraper");
 
 async function connectDB() {
   try {
@@ -58,7 +57,6 @@ async function connectDB() {
 
     // Initialize Cron Jobs
     setupJobAlerts(db);
-    setupJobScraper(db);
 
   } catch (error) {
     console.error("Failed to connect to MongoDB:", error);

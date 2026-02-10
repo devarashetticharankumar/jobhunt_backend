@@ -238,13 +238,9 @@ const { checkJwt } = require("../middleware/auth");
 const { jobSchema } = require("../validation/schemas");
 const validate = require("../validation/validate");
 const nodemailer = require("nodemailer");
-const puppeteer = require("puppeteer-extra");
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const cron = require("node-cron");
-const sanitizeHtml = require("sanitize-html");
 const slugify = require("slugify");
 
-puppeteer.use(StealthPlugin());
 
 // Nodemailer transporter setup
 let transporter = nodemailer.createTransport({
@@ -254,31 +250,6 @@ let transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASSWORD,
   },
 });
-
-// Scrape and post jobs
-
-
-// Manual scraping route
-// Manual scraping route
-router.get("/scrape-jobs", async (req, res) => {
-  try {
-    const db = req.app.locals.db;
-    const { scrapeAndPostJobs } = require("../services/jobScraperService");
-
-    // Allow location override via query param for testing
-    const location = req.query.location || "United States";
-    console.log(`Manual scraping triggered for location: ${location}`);
-
-    const allRecentJobs = await scrapeAndPostJobs(db, location);
-    res.json(allRecentJobs);
-  } catch (error) {
-    console.error("Manual scraping error:", error);
-    res.status(500).send({ message: "Scraping failed", error: error.message });
-  }
-});
-
-// Schedule automation every 24 hours at midnight UTC
-
 
 // CRUD routes
 router.post("/postjob", checkJwt, validate(jobSchema), async (req, res) => {
