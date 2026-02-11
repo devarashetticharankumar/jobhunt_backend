@@ -61,7 +61,7 @@ const setupJobAlerts = (db) => {
 
                     const jobListHtml = matchingJobs.map(job => `
                         <div style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                            <h3><a href="http://localhost:5173/job/${job._id}">${job.jobTitle}</a></h3>
+                            <h3><a href="https://jobnirvana.netlify.app/job/${job._id}">${job.jobTitle}</a></h3>
                             <p><strong>${job.companyName}</strong> - ${job.jobLocation}</p>
                             <p>Salary: ${job.minPrice}-${job.maxPrice}k</p>
                         </div>

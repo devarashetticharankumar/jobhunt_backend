@@ -252,6 +252,7 @@ let transporter = nodemailer.createTransport({
 });
 
 // CRUD routes
+// CRUD routes
 router.post("/postjob", checkJwt, validate(jobSchema), async (req, res) => {
   const db = req.app.locals.db;
   const jobCollections = db.collection("demoJobs");
@@ -308,6 +309,78 @@ router.post("/postjob", checkJwt, validate(jobSchema), async (req, res) => {
   } catch (error) {
     console.error("Critical error in /postjob route:", error);
     res.status(500).send({ message: "Server error", error: error.message || error });
+  }
+});
+
+// Bulk Post Route
+router.post("/bulk-post", checkJwt, async (req, res) => {
+  const db = req.app.locals.db;
+  const jobCollections = db.collection("demoJobs");
+  const subscriptionsCollection = db.collection("EmailSubscriptions");
+
+  try {
+    const jobs = req.body; // Expecting an array
+    if (!Array.isArray(jobs)) {
+      return res.status(400).send({ message: "Request body must be an array of jobs" });
+    }
+
+    // Filter out jobs that don't have a title (minimal requirement to prevent frontend crashes)
+    const validJobs = jobs.filter(j => j.jobTitle && j.jobTitle.trim());
+
+    if (validJobs.length === 0) {
+      return res.status(400).send({ message: "No valid jobs found. Each job must have a 'jobTitle'." });
+    }
+
+    const processedJobs = validJobs.map(job => {
+      const now = new Date();
+      const baseSlug = slugify(job.jobTitle, { lower: true, strict: true });
+      return {
+        ...job,
+        createdAt: now,
+        slug: `${baseSlug}-${new ObjectId().toString().slice(-6)}`
+      };
+    });
+
+    console.log(`Bulk inserting ${processedJobs.length} valid jobs (out of ${jobs.length})...`);
+    const result = await jobCollections.insertMany(processedJobs);
+
+    // Batch Email Notification
+    (async () => {
+      try {
+        const subscribers = await subscriptionsCollection.find({}).toArray();
+        const subscriberEmails = subscribers.map((s) => s.email);
+
+        if (subscriberEmails.length > 0) {
+          let mailOptions = {
+            from: process.env.EMAIL_USERNAME,
+            to: subscriberEmails,
+            subject: `New Jobs Batch Alert: ${processedJobs.length} opportunities!`,
+            html: `
+              <h1>Great News! ${processedJobs.length} New Jobs Just Posted</h1>
+              <p>Check out our latest openings including:</p>
+              <ul>
+                ${processedJobs.slice(0, 5).map(j => `<li><strong>${j.jobTitle}</strong> at ${j.companyName}</li>`).join('')}
+                ${processedJobs.length > 5 ? `<li>...and ${processedJobs.length - 5} more!</li>` : ''}
+              </ul>
+              <p>View all jobs at <a href="https://jobnirvana.netlify.app/all-jobs" target="_blank">JobNirvana</a>.</p>
+            `,
+          };
+          await transporter.sendMail(mailOptions);
+          console.log("Bulk notification email sent");
+        }
+      } catch (err) {
+        console.error("Failed to send bulk email notification:", err);
+      }
+    })();
+
+    res.status(200).send({
+      acknowledged: true,
+      insertedCount: result.insertedCount,
+      insertedIds: result.insertedIds
+    });
+  } catch (error) {
+    console.error("Bulk post error:", error);
+    res.status(500).send({ message: "Failed to process bulk upload", error: error.message });
   }
 });
 

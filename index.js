@@ -118,10 +118,6 @@ app.get("/", (req, res) => {
   res.send("Hello World!!!!!!!!!!!");
 });
 
-app.get("/", (req, res) => {
-  res.send("Hello World!!!!!!!!!!!");
-});
-
 // Start server immediately/after attempt, don't wait for success
 connectDB().finally(() => {
   app.listen(port, "0.0.0.0", () => {

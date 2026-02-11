@@ -152,6 +152,41 @@ router.patch("/update-blog/:slug", validate(blogSchema), async (req, res) => {
   }
 });
 
+// Bulk Post Blogs
+router.post("/bulk-post", async (req, res) => {
+  const db = req.app.locals.db;
+  const blogCollection = db.collection("blogs");
+
+  try {
+    const blogs = req.body;
+    if (!Array.isArray(blogs)) {
+      return res.status(400).send({ message: "Request body must be an array" });
+    }
+
+    const validBlogs = blogs.filter(b => b.title && b.content);
+    if (validBlogs.length === 0) {
+      return res.status(400).send({ message: "No valid blogs found. Title and content are required." });
+    }
+
+    const processedBlogs = validBlogs.map(blog => ({
+      ...blog,
+      publishedDate: new Date(),
+      slug: generateSlug(blog.title)
+    }));
+
+    const result = await blogCollection.insertMany(processedBlogs);
+
+    res.status(201).send({
+      acknowledged: true,
+      insertedCount: result.insertedCount,
+      insertedIds: result.insertedIds
+    });
+  } catch (error) {
+    console.error("Bulk blog post error:", error);
+    res.status(500).send({ message: "Server error", error: error.message });
+  }
+});
+
 module.exports = router;
 
 // const express = require("express");
