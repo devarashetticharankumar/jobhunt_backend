@@ -85,6 +85,7 @@ const resume = require("./routes/resumeRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
+const aiResumeRoutes = require("./routes/aiResumeRoutes");
 
 app.use("/jobs", jobRoutes);
 app.use("/users", userRoutes);
@@ -94,6 +95,7 @@ app.use("/blogs", blogRoutes);
 app.use("/", sitemapRouter);
 app.use("/resumes", resume);
 app.use("/ai", aiRoutes);
+app.use("/ai-resume", aiResumeRoutes);
 app.use("/applications", applicationRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/uploads", express.static("uploads")); // Serve uploaded resumes

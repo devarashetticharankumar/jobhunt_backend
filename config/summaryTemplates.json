@@ -1,0 +1,9 @@
+{
+    "software_engineer": "Results-oriented Software Engineer with {years} years of experience in {topSkills}. Proven track record of building scalable web applications and optimizing system performance. Passionate about solving complex problems and delivering high-quality code.",
+    "frontend_developer": "Creative Frontend Developer with {years} years of experience specializing in React and modern UI/UX principles. Expert in {topSkills} with a focus on creating responsive and accessible user interfaces.",
+    "backend_developer": "Robust Backend Developer with {years} years of experience in server-side logic and database management. Highly proficient in {topSkills} and architecting efficient API layers.",
+    "fullstack_developer": "Versatile Full Stack Developer with {years} years of experience across the entire web development lifecycle. Strong command of {topSkills} for both client-side and server-side development.",
+    "data_analyst": "Detail-oriented Data Analyst with {years} years of experience turning complex datasets into actionable insights. Skilled in {topSkills} and statistical modeling to drive business growth.",
+    "project_manager": "Dynamic Project Manager with {years} years of experience leading cross-functional teams. Expert in {topSkills} and agile methodologies to ensure project delivery on time and within budget.",
+    "generic": "Dedicated professional with {years} years of experience in {role}. Strong background in {topSkills} with a commitment to continuous learning and professional growth."
+}

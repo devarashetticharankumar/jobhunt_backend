@@ -132,8 +132,14 @@ const resumeSchema = Joi.object({
     "startup", "classic"
   ).default("modern").optional(),
 
+  // AI-Related Fields
+  aiGeneratedSummary: Joi.boolean().optional(),
+  atsScore: Joi.number().min(0).max(100).optional(),
+  atsBreakdown: Joi.object().optional(),
+  lastAnalyzedAt: Joi.date().optional(),
+
   // Last Modified Date
   lastModified: Joi.date().default(Date.now),
-});
+}).unknown(true);
 
 module.exports = resumeSchema;
